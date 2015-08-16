@@ -1,0 +1,21 @@
+/* DO NOT MODIFY (unless you are changing fonts or background colors or something of that sort) */
+
+html{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body{
+	color: black;
+	background: gray;
+
+	font-family: Arial, sans-serif;	
+}
+
+body#Scoreboard{
+    margin: 8px;
+    height: calc( 100% - 16px );
+
+    font-family: Arial, sans-serif;
+}

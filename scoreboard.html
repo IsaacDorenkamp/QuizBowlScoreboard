@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html ng-app="scoreboard" ng-controller="ScoreBoard_Ctrl">
+	<head>
+		<title ng-bind="Properties.Title"></title>
+
+		<meta http-equiv="Pragma" Content="no-cache" />
+		<meta http-equiv="Expires" content="-1" />
+		<link rel="stylesheet" href="css/Universal.css" />
+
+		<script src="js/app5/App5.js"></script>
+		<script src="js/core.js"></script>
+		<script src="js/angular.min.js"></script>
+		<script src="js/app.js"></script>
+		<script>
+			APP5_PATH = 'js/app5';
+
+			App5.AddInitializer( function(){
+				var tag = document.createElement('link');
+				tag.rel = 'stylesheet';
+				tag.href= 'css/style.css';
+
+				var tag2 = document.createElement('link');
+				tag2.rel = 'stylesheet';
+				tag2.media = 'screen and (min-width: 1024px) and (min-height: 768px)';
+				tag2.href = 'css/Projector.css';
+
+				document.head.appendChild( tag );
+				document.head.appendChild( tag2 );
+			} );
+		</script>
+		<style>
+			/* Normally, avoid inline styles. But sometimes, they are needed
+			for immediate styling without having to load CSS files due to the
+			fact that other styles have to load to style the bare, ugly, unstyled
+			content. */
+
+			body{
+				visibility: hidden;
+			}
+
+		</style>
+	</head>
+	<body id="Scoreboard" onload="setTimeout( TextAdjustor.ResizePlayers, 100 )">
+		<app5-menubar>
+			<app5-menuref menu="Function-Menu">Function</app5-menuref>
+			<app5-menuref menu="Settings-Menu">Settings</app5-menuref>
+			<app5-menuref menu="Properties-Menu">Properties</app5-menuref>
+			<app5-menuref menu="Help-Menu">Help</app5-menuref>
+
+			<app5-menu-meta>
+				<app5-menu id="Function-Menu">
+					<app5-menu-item onclick="Application.LoginDialog.show()" id="StartGame">Start Game</app5-menu-item>
+					<app5-menu-item ng-click="Game.Destroy()" id="FinalizeScores">Finalize Scores</app5-menu-item>
+					<app5-menu-item ng-click="Game.ResetConfirm()">Reset Scoreboard</app5-menu-item>
+				</app5-menu>
+				<app5-menu id="Settings-Menu">
+					<app5-menu-item onclick="Application.SetRoundTime.show()">Set Round Time</app5-menu-item>
+					<app5-menu-item onclick="Application.SetTossupTime.show()">Set Toss-up Timer</app5-menu-item>
+					<app5-menu-item onclick="Application.SetBonusTime.show()">Set Bonus Timer</app5-menu-item>
+					<app5-menu-item onclick="Application.WarningBox.checked = !Application.WarningBox.checked">Set 5 Second Warning&nbsp;<input type="checkbox" id="WarningBox" checked /></app5-menu-item>
+					<app5-menu-item ng-click="Settings.DoResults = !Settings.DoResults">Show Results at end of Game&nbsp;<input type="checkbox" id="DoResults" ng-model="Settings.DoResults" /></app5-menu-item>
+				</app5-menu>
+				<app5-menu id="Properties-Menu">
+					<app5-menu-item ng-click="ShowPropertySetter( 'Title' )">Set Title</app5-menu-item>
+					<app5-menu-item ng-click="ShowPropertySetter( 'Room' )">Set Room/Location</app5-menu-item>
+					<app5-menu-item ng-click="ShowPropertySetter( 'Email' )">Set E-Mail Address</app5-menu-item>
+					<app5-menu-item ng-click="ShowPropertySetter( 'Phone' )">Set Phone Number</app5-menu-item>
+				</app5-menu>
+				<app5-menu id="Help-Menu">
+					<app5-menu-item onclick="Application.Intro.show()">Instructions</app5-menu-item>
+				</app5-menu>
+			</app5-menu-meta>
+		</app5-menubar>
+		<!-- Notification for Testing / Distribution Purposes -->
+		<!-- <app5-notification id="WarningNotif"></app5-notification> -->
+		<audio src="audio/five_minutes.wav" id="audio_five_minutes"></audio>
+		<audio src="audio/five_seconds.wav" id="audio_five_seconds"></audio>
+		<audio src="audio/match_over.wav" id="audio_match_over"></audio>
+		<audio src="audio/one_minute.wav" id="audio_one_minute"></audio>
+		<audio src="audio/time.wav" id="audio_time"></audio>
+		
+		<div id="loading">
+			<h1>Loading application for your best experience, please wait...</h1>
+			<progress></progress>
+		</div>
+
+		<div id="app">
+			<div id="title">
+				<div id="title-text">
+					{{ Properties.Title }} - {{ Properties.Room }}
+				</div>
+			</div>
+			<div id="middle">
+				<div id="middle-left">
+					<div id="GameClock-Container">
+						<div id="GameClock" data-enabled="false" ng-click="Game.ToggleTimer()">{{ Game.GameTime.toString() }}</div>
+					</div>
+				</div>
+				<div id="middle-right">
+					<div id="QuestionClock-Container">
+						<div id="QuestionClock" data-enabled="false" ng-click="Game.ToggleQuestionTimer()" ng-bind="Game.QuestionTime.format('S.D')"></div>
+					</div>
+				</div>
+			</div>
+			<div id="bottom">
+				<div id="bottom-left">
+					<div id="Players">
+						<div id="Player1" class="player">
+							<div class="player-name" ng-click="ShowTeamSetter('Team1')">{{ Game.Team1.getName() }}</div>
+							<div class="player-score">
+								<button ng-click="Game.Team1.SubtractScore( 5 )">-5</button><span class="score" ng-click="Game.Team1.AddScore( 5 )" ng-context-menu="Game.Team1.SubtractScore( 5 )">{{ Game.Team1.getScore() }}</span><button ng-click="Game.Team1.AddTie(Game.Team1, Game.Team2)">+1</button>
+							</div>
+						</div>
+						<div id="Player2" class="player">
+							<div class="player-name" ng-click="ShowTeamSetter('Team2')">{{ Game.Team2.getName() }}</div>
+							<div class="player-score">
+								<button ng-click="Game.Team2.SubtractScore( 5 )">-5</button><span class="score" ng-click="Game.Team2.AddScore( 5 )" ng-context-menu="Game.Team2.SubtractScore( 5 )">{{ Game.Team2.getScore() }}</span><button ng-click="Game.Team2.AddTie(Game.Team1, Game.Team2)">+1</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="bottom-right">
+					<div id="buttons">
+						<button ng-click="Game.SetQuestionTime( Settings.TossupTime.getSeconds() )">{{ Settings.TossupTime.getSeconds() }}s</button>
+						<button ng-click="Game.SetQuestionTime( Settings.BonusTime.getSeconds() )">{{ Settings.BonusTime.getSeconds() }}s</button>
+						<button ng-click="Game.SetQuestionTime( 0 )">0s</button>
+					</div>
+				</div>
+			</div>
+			<footer id="footer">
+				QuizBowl Scoreboard, written in 2015 by Isaac Dorenkamp (aka Quantum) of <a href="http://pcicrew.pcriot.com">Chromodynamic Studios</a>.
+			</footer>
+		</div>
+
+		<app5-modal>
+			<app5-dialog id="SetRoundTime" class="TimeSetterDialog">
+				<div class="dialog-title">
+					Set Round Time
+				</div>
+				<div class="dialog-content">
+					To add time to each section: Click.
+					<br />
+					To subtract time: Right Click.
+					<br />
+					<div id="RoundTime_Setter" class="TimeSetter">
+						<button ng-click="Settings.GameTime.SubtractMinute()">-M</button>
+						<button ng-click="Settings.GameTime.SubtractSecond()">-S</button>
+						<span ng-click="Settings.GameTime.AddMinute()" ng-context-menu="Settings.GameTime.SubtractMinute()" class="time">{{ Settings.GameTime.getMinutes() }}</span>&nbsp;:
+						<span ng-click="Settings.GameTime.AddSecond()" ng-context-menu="Settings.GameTime.SubtractSecond()" class="time">{{ FillZeros( Settings.GameTime.getSeconds() ) }}</span>
+						<button ng-click="Settings.GameTime.AddSecond()">+S</button>
+						<button ng-click="Settings.GameTime.AddMinute()">+M</button>
+					</div>
+					<button ng-click="UpdateTimer()" onclick="Application.SetRoundTime.close()">OK</button>
+				</div>
+			</app5-dialog>
+			<app5-dialog id="SetTossupTime" class="TimeSetterDialog">
+				<div class="dialog-title">
+					Set Toss-up Time
+				</div>
+				<div class="dialog-content">
+					To add seconds: Click.
+					<br />
+					To subtract: Right Click.
+					<br />
+					<div id="TossupTime_Setter" class="TimeSetter">
+						<button ng-click="Settings.TossupTime.SubtractSecond()">-S</button>
+						<span ng-click="Settings.TossupTime.AddSecond()" ng-context-menu="Settings.TossupTime.SubtractSecond()" class="time">{{ FillZeros( Settings.TossupTime.getSeconds() ) }}s</span>
+						<button ng-click="Settings.TossupTime.AddSecond()">+S</button>
+					</div>
+					<button onclick="Application.SetTossupTime.close()">OK</button>
+				</div>
+			</app5-dialog>
+			<app5-dialog id="SetBonusTime" class="TimeSetterDialog">
+				<div class="dialog-title">
+					Set Bonus Time
+				</div>
+				<div class="dialog-content">
+					To add seconds: Click.
+					<br />
+					To subtract: Right Click.
+					<br />
+					<div id="BonusTime_Setter" class="TimeSetter">
+						<button ng-click="Settings.BonusTime.SubtractSecond()">-S</button>
+						<span ng-click="Settings.BonusTime.AddSecond()" ng-context-menu="Settings.BonusTime.SubtractSecond()" class="time">{{ FillZeros( Settings.BonusTime.getSeconds() ) }}s</span>
+						<button ng-click="Settings.BonusTime.AddSecond()">+S</button>
+					</div>
+					<button onclick="Application.SetBonusTime.close()">OK</button>
+				</div>
+			</app5-dialog>
+
+			<app5-dialog id="Results">
+				<!-- No title for this one! -->
+				<div class="dialog-content">
+					<h1>RESULTS</h1>
+					<div class="score-row">Score for {{ Game.Team1.getName() }}: <span class="score">{{ Game.Team1.getScore() }}</span></div>
+					<div class="score-row">Score for {{ Game.Team2.getName() }}: <span class="score">{{ Game.Team2.getScore() }}</span></div>
+					<div class="winner-wrapper"><div class="winner-row">Winner: <span class="winner">{{ GetWinner( Game.Team1, Game.Team2 ) }}</span></div></div>
+					<button onclick="Application.Results.close()">OK</button>
+				</div>
+			</app5-dialog>
+
+			<app5-dialog id="PropertySetter-Dialog">
+				<div class="dialog-title">
+					Setting Property {{ PropertySetter.Property }}
+				</div>
+				<div class="dialog-content">
+					<div id="prp-set-wrapper">
+						<div>New Value: <input type="text" ng-model="Properties[ PropertySetter.Property ]" id="PropertySetter-Box" onkeydown="DialogEnterCheck( event, Application.PropertySetter )" /></div>
+						<button onclick="Application.PropertySetter.close()">OK</button>
+					</div>
+				</div>
+			</app5-dialog>
+			<app5-dialog id="TeamSetter-Dialog">
+				<div class="dialog-title">
+					Setting Team Name: {{ CurrentTeam }}
+				</div>
+				<div class="dialog-content">
+					<div id="tm-set-wrapper">
+						<div>New Value: <input type="text" ng-model="Game[ CurrentTeam ].name" id="TeamSetter-Box" onkeydown="DialogEnterCheck( event, Application.TeamSetter )" /></div>
+						<button onclick="Application.TeamSetter.close()">OK</button>
+					</div>
+				</div>
+			</app5-dialog>
+
+			<app5-dialog id="LoginDialog">
+				<div class="dialog-title">
+					Log In to Competition
+					<a href="javascript:Application.LoginDialog.close()" class="dialog-closer">X</a>
+				</div>
+				<div class="dialog-content">
+					<form action="#" method="POST" onsubmit="App5.consume( event )" ng-submit="Game.Create( Application.LoginForm )" id="LoginForm">
+						<table class="form">
+							<tbody>
+								<tr>
+									<td>Access ID:</td>
+									<td><input type="text" name="comp_access_id" /></td>
+								</tr>
+								<tr>
+									<td>Competition Password:</td>
+									<td><input type="password" name="comp_pwd" /></td>
+								</tr>
+							</tbody>
+						</table>
+						<button type="Submit">Log In to Competition</button>
+					</form>
+				</div>
+			</app5-dialog>
+			<app5-dialog id="ProgressDialog">
+				<div class="dialog-title">
+					Please Wait...
+				</div>
+				<div class="dialog-content">
+					<!-- Progress bar for waiting... -->
+					<progress></progress>
+				</div>
+			</app5-dialog>
+			<app5-dialog id="SuccessDialog" class="status-dialog">
+				<div class="dialog-title">
+					Success
+				</div>
+				<div class="dialog-content">
+					<h1 class="success">Success!</h1>
+					<button onclick="Application.SuccessDialog.close()" class="ok">OK</button>
+				</div>
+			</app5-dialog>
+			<app5-dialog id="FailureDialog" class="status-dialog">
+				<div class="dialog-title">
+					Failure
+				</div>
+				<div class="dialog-content">
+					<h1 class="failure"><span>Error: {{ Error || "Operation Failed." }}</span></h1>
+					<button onclick="Application.FailureDialog.close()" class="ok">OK</button>
+				</div>
+			</app5-dialog>
+			<app5-dialog id="AlertDialog" class="status-dialog">
+				<div class="dialog-title">
+					{{ Details.Alert.Title }}
+				</div>
+				<div class="dialog-content">
+					<h1>{{ Details.Alert.Message }}</h1>
+					<button onclick="Application.AlertDialog.close()" class="ok">OK</button>
+				</div>
+			</app5-dialog>
+			<app5-dialog id="PromptDialog" class="status-dialog">
+				<div class="dialog-title">
+					{{ Details.Prompt.Title }}
+				</div>
+				<div class="dialog-content">
+					<form id="PromptForm">
+						<label>{{ Details.Prompt.Message }}</label>
+						<br />
+						<input type="text" name="prompt" />
+						<button onclick="Application.FinishPrompt()" class="ok">OK</button>
+					</form>
+				</div>
+			</app5-dialog>
+
+
+			<app5-dialog id="Intro">
+				<div class="dialog-title">
+					Welcome to quizbowl.us Scoreboard!
+				</div>
+				<div class="dialog-content">
+					<div class="title">We just have some basic instructions for you before you get started using the <a href="http://quizbowl.us">quizbowl.us</a> scoreboard!</div>
+					<pre id="instructions" ng-bind-html="Instructions"></pre>
+					<div class="dialog-bottom-row">
+						<div class="dialog-dsa">
+							<input type="checkbox" id="dsa" /><label>Do not show this dialog again</label>
+						</div>
+					</div>
+
+					<button class="dialog-ok-button" onclick="Application.CloseIntro()">OK, let&apos;s get started!</button>
+				</div>
+			</app5-dialog>
+		</app5-modal>
+	</body>
+</html>

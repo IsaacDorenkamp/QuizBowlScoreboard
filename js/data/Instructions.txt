@@ -1,0 +1,38 @@
+<span style="color:red">--SCORING SYSTEM--</span>
+
+	-> Left-click the +1 button to add 1 point (only if the teams are tied); left-click the
+	   -5 button to subtract 5 points (will round down to nearest multiple of five if the
+	   score is not a multiple of 5).
+
+	-> Left-click a player's score to add 5 points to it;
+	   right-click a player's score to subtract 5 points from it.
+
+<span style="color:red">--MENUS--</span>
+
+	-> <span style="color:gold">The Function Menu</span>
+
+		-> <span style="color:blue">Start Game</span>        -- Begin game on the server side
+		-> <span style="color:blue">Reset Scoreboard</span>  -- Reset scoreboard entirely.
+
+	-> <span style="color:gold">The Settings Menu</span>
+
+		-> <span style="color:blue">Set Round Time</span>       -- Set the total time for a game (15 minutes
+		                           by default).
+
+		-> <span style="color:blue">Set Tossup Time</span>      -- Set the time for a tossup question (10
+		                           seconds by default).
+
+		-> <span style="color:blue">Set Bonus Time</span>       -- Set the time for a bonus question (20
+		                           seconds by default).
+
+		-> <span style="color:blue">Set 5 Second Warning</span> -- Turn the 5-second warning system on or
+		                           off (on by default).
+
+	-> <span style="color:gold">The Properties Menu</span>
+
+		-> All items are properties of the web application. They are very
+		   self-explanatory.
+
+	-> <span style="color:gold">The Help Menu</span>
+
+		-> <span style="color:blue">Instructions</span> -- View this dialog for reference.

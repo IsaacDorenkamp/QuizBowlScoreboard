@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>QuizBowl Competition Home</title>
+		<script src="js/app5/App5.js"></script>
+		<script src="js/gcore.js"></script>
+		<link rel="stylesheet" href="css/Universal.css" />
+		<link rel="stylesheet" href="css/index.css" />
+	</head>
+	<body>
+		<div id="app">
+			<div id="sidebar">
+				<h1>QuizBowl Scoreboard</h1>
+				<hr />
+				<ul id="actions">
+					<li><a href="javascript:Application.CreateDialog.show()">Create a Competition</a></li>
+					<li><a href="javascript:void()">Watch a Competition</a></li>
+					<hr />
+					<li><a href="scoreboard.html">Use the scoreboard!</a></li>
+				</ul>
+			</div>
+			<div id="main">
+
+			</div>
+		</div>
+
+		<app5-modal>
+			<app5-dialog id="CreateCompetition">
+				<div class="dialog-title">
+					Create a Competition
+					<a href="javascript:Application.CreateDialog.close()" class="dialog-closer">X</a>
+				</div>
+				<div class="dialog-content">
+					
+				</div>
+			</app5-dialog>
+		</app5-modal>
+	</body>
+</html>

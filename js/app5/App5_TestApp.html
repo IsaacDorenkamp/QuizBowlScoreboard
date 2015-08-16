@@ -1,0 +1,164 @@
+<html>
+	<head>
+		<title>Real life App5 Application</title>
+		
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+		
+		<script src="App5.js"></script>
+		<script>
+			function closeWindow(){
+				var do_close = confirm('Are you sure you want to exit?');
+				if(do_close){
+					location.assign('about:blank');
+				}
+			}
+			function add_item(list,item){
+				var list = document.getElementById(list);
+				var new_el = document.createElement('li');
+				new_el.innerHTML = item;
+				
+				new_el.oncontextmenu = function(e){ deleteItem(new_el); App5.consume(e) };
+				
+				list.appendChild(new_el);
+			}
+			function deleteItem(el){
+				var do_delete = confirm("Delete item '"+el.innerHTML+"'?");
+				if(do_delete){
+					el.parentElement.removeChild( el );
+				}
+			}
+			function add_tab(name){
+				if(name == null || name == undefined || name == "") return;
+				var newtab = document.createElement('app5-tab');
+				newtab.setAttribute("panel",name);
+				var newpan = document.createElement('app5-panel');
+				newpan.id=name;
+				newpan.innerHTML='<h1>'+name+'</h1><hr /><ul id="'+name+'s-list"></ul>';
+				
+				var tabmeta = document.getElementById("TabMeta-1");
+				tabmeta.appendChild(newpan);
+				
+				var tabstrip = document.getElementById("TabStrip-1");
+				newtab.innerText = name;
+				tabstrip.appendChild(newtab);
+				
+				var menuitem = document.createElement("app5-menu-item");
+				menuitem.innerText = "Add item to "+name;
+				menuitem.onclick=function(){ add_item(name+"s-list",prompt('Item to add to '+name)) };
+				
+				var editmenu = document.getElementById("Edit-Menu");
+				editmenu.insertBefore(menuitem,editmenu.childNodes[0]);
+			}
+			function show_help(){
+				alert("Add Item by choosing a list in the Edit menu.\nDelete items by right-clicking them.");
+			}
+			function show_dialog(){
+				var dlg = document.getElementById("dialog");
+				dlg.show();
+			}
+			
+			function init(){
+				var dlg_cont = document.getElementById("dialog_content");
+				var tabs = document.getElementById("TabStrip-1").childNodes;
+				var first = true;
+				for(var i = 0; i < tabs.length; i++){
+					if( ! HTMLElement.prototype.isPrototypeOf(tabs[i]) ){
+						continue;
+					}
+					if( !first ){
+						dlg_cont.innerHTML+="<br />";
+					}else{
+						first = false;
+					}
+					dlg_cont.innerHTML+="Tab: "+tabs[i].innerHTML;
+				}
+				var r_rand = Math.round(Math.random()*255);
+				var g_rand = Math.round(Math.random()*255);
+				var b_rand = Math.round(Math.random()*255);
+				
+				var r2_rand = Math.round(Math.random()*255);
+				var g2_rand = Math.round(Math.random()*255);
+				var b2_rand = Math.round(Math.random()*255);
+				var gradient = 'radial-gradient(top left, rgb('+r_rand+','+g_rand+','+b_rand+'),'+' rgb('+r2_rand+','+g2_rand+','+b2_rand+') )';
+				App5.css(document.body, 'background', gradient, 1);
+			}
+			App5.AddInitializer(init);
+		</script>
+		<style>
+			h1{
+				margin:0;
+			}
+			body{
+				margin:0;
+				padding:0;
+				background-size: 100% 100%;
+				height:105%;
+			}
+			ul:empty::after{
+				text-indent:10px;
+				color:lightgrey;
+				font-style:italic;
+				text-decoration:underline;
+				cursor:pointer;
+				content:'No items yet.';
+			}
+			#TabMeta-1{
+				background: white;
+			}
+		</style>
+	</head>
+	<body>
+		<app5-menubar style="margin-top:10px;">
+			<app5-menuref menu="File-Menu">File</app5-menuref>
+			<app5-menuref menu="Edit-Menu">Edit</app5-menuref>
+			<app5-menuref menu="Help-Menu">Help</app5-menuref>
+			<app5-menu-meta>
+				<app5-menu id="File-Menu">
+					<app5-menu-item onclick="closeWindow()">Exit</app5-menu-item>
+				</app5-menu>
+				<app5-menu id="Edit-Menu">
+					<app5-menu-cascade menu="Add-Edit-Cascade">Add</app5-menu-cascade>
+					<app5-menu-item onclick="show_dialog()">Get Tab List</app5-menu-item>
+					<app5-menu-item onclick="add_tab(prompt('New Tab Name'))">Add Tab</app5-menu-item>
+					<app5-menu-item class="menu-control">Stuff: <input type="text" id="stuff-input" /></app5-menu-item>
+				</app5-menu>
+				<app5-menu id="Add-Edit-Cascade">
+					<app5-menu-item onclick="add_item('groceries',prompt('Item to add to grocery list: '))">Add Grocery</app5-menu-item>
+					<app5-menu-item onclick="add_item('todo-list',prompt('What do you need to do today?'))">Add to Todo list</app5-menu-item>
+				</app5-menu>
+				<app5-menu id="Help-Menu">
+					<app5-menu-item onclick="show_help()">How To</app5-menu-item>
+				</app5-menu>
+			</app5-menu-meta>
+		</app5-menubar>
+		
+		<app5-tabpane>
+			<app5-tab-strip id="TabStrip-1">
+				<app5-tab panel="grocery-list">Grocery List</app5-tab>
+				<app5-tab panel="todo">Todo List</app5-tab>
+			</app5-tab-strip>
+			
+			<app5-tab-meta id="TabMeta-1">
+				<app5-panel id="grocery-list">
+					<app5-effect effect="Shake" style="position:relative"><h1>Groceries</h1></app5-effect>
+					<hr />
+					<ul id="groceries"></ul>
+				</app5-panel>
+				<app5-panel id="todo">
+					<h1>To Do</h1>
+					<hr />
+					<ul id="todo-list"></ul>
+				</app5-panel>
+			</app5-tab-meta>
+		</app5-tabpane>
+		<app5-modal>
+			<app5-dialog id="dialog">
+				<div class="dialog_title">List of Tabs<a class="dialog_closer" href="javascript:document.getElementById('dialog').close()">X</a></div>
+				<hr />
+				<div class="dialog_content" id="dialog_content">
+				<!-- Content generated in JS. -->
+				</div>
+			</app5-dialog>
+		</app5-modal>
+	</body>
+</html>

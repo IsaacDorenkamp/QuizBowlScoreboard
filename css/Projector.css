@@ -1,0 +1,41 @@
+/* Special Style overrides for 1024 x 768 Size Screens */
+
+div#GameClock, div#QuestionClock{
+    font-size: 72pt;
+    margin-top: 30px;
+}
+
+div#buttons{
+    padding-top: 30px;
+    padding-left: 30px;
+    height: calc( 100% - 34px );
+}
+div#buttons > button{
+    font-weight: bold;
+    font-size: 24pt;
+    height: 90px;
+    width: 90px;
+    margin-right: 25px;
+}
+#timer-info{
+    display: none;
+    visibility: hidden;
+
+    position: absolute;
+    height: 0;
+    width: 0;
+    bottom: 0;
+}
+
+footer#footer{      /* Need specific selector to override defaults here */
+    position: fixed;
+    bottom: 0;
+
+    width: 100%;
+
+    visibility: visible;
+    display: block;
+
+    text-align: center;
+    padding-bottom: 15px;
+}

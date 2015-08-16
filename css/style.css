@@ -1,0 +1,473 @@
+app5-menubar{
+	padding: 8px;
+	background: gray;
+}
+app5-menuref{
+	padding: 4px;
+}
+app5-menu-item{
+	padding: 5px;
+}
+app5-menu-item > input[type="checkbox"]{
+	cursor: pointer;
+}
+
+body.loaded{
+	visibility: visible;
+}
+
+div#app{
+	margin: 3px 0;
+	display: block;
+	height: 85%;
+}
+
+div#loading{
+	position: fixed;
+	top: 45%;
+}
+body:not(.loaded) > div#loading{
+	visibility: visible;
+}
+body.loaded > div#loading{
+	visibility: hidden;
+}
+
+a:link:not(.dialog-closer), a:visited:not(.dialog-closer){
+	color: skyblue;
+}
+a:hover:not(.dialog-closer){
+	text-decoration: none;
+}
+a:active:not(.dialog-closer){
+	color: white;
+}
+
+div#title{
+	height: 100px;
+	padding: 10px;
+
+	text-align: center;
+
+	font-size: 48pt;
+
+	border: 2px solid black;
+}
+div#title-text{
+	display: inline-block;
+	vertical-align: middle;
+}
+
+div#middle{
+	height: 200px;
+	margin: 5px 0 0 0 !important;
+}
+div#bottom{
+	height: 175px;
+}
+div#middle-left{
+	padding-left: 5px;
+	padding-right: 10px;
+
+	width: calc( 55% + 15px );
+
+	height: calc( 100% - 9px );
+	float: left;
+}
+div#middle-right{
+	width: 40%;
+	height: calc( 100% - 13px );
+	float: right;
+
+	text-align: center;
+}
+
+div#bottom-left{
+	padding-left: 5px;
+	padding-right: 10px;
+
+	width: calc( 55% + 15px );
+
+	height: 100%;
+	float: left;
+}
+div#bottom-right{
+	padding-left: 15px;
+
+	width: 40%;
+
+	text-align: center;
+
+	height: 100%;
+	float: right;
+}
+
+div#buttons{
+	border: 2px solid black;
+
+	height: calc( 100% - 19px );
+	width: calc( 90% - 4px );
+
+	padding-left: 10px;
+	padding-right: 5px;
+
+	margin: 0 auto;
+	padding-top: 15px;
+}
+div#buttons > button{
+	font-weight: bold;
+	font-size: 24pt;
+	height: 125px;
+	width: 125px;
+	margin-right: 12px;
+}
+div#buttons > div, div#buttons > div > ul{
+	display: inline-block;
+}
+div#buttons > div > h2{
+	margin: 0;
+}
+
+span.list-time{
+	float: right;
+}
+
+div#info{
+	float: left;
+	width: calc( 40% + 15px );
+
+	padding-left: 5px;
+	padding-right: 10px;
+
+	border: 2px solid black;
+	height: calc( 100% - 4px );
+
+	font-size: 48pt;
+}
+
+div#GameClock-Container, div#QuestionClock-Container{
+	font-size: 72pt;
+	cursor: pointer;
+	height: calc( 100% - 4px );
+	width: calc( 90% - 4px );
+
+	margin: 0 auto;
+
+	border: 2px solid black;
+
+	text-align: center;
+
+	padding-left: 5px;
+	padding-right: 10px;
+
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+
+	color:black;
+}
+
+div#GameClock, div#QuestionClock{
+	color: black;
+	height: 150px;
+	text-align: inherit;
+	margin-top: 30px;
+}
+
+div#GameClock[data-enabled="false"], div#QuestionClock[data-enabled="false"]{
+	color: lightgray;
+}
+
+div#Players{
+	border: 2px solid black;
+
+	height: calc( 100% - 4px );
+	width: calc( 90% - 4px );
+
+	padding-left: 5px;
+	padding-right: 10px;
+
+	margin: 0 auto;
+
+	position: relative;
+}
+
+div.player{
+	width: 50%;
+
+	text-align: center;
+
+	font-size: 36pt;
+
+	position: absolute;
+	top: 50%;
+	transform: translateY( -50% );
+	-webkit-transform: translateY( -50% );
+}
+
+div.player-name{
+	border-bottom: 3px solid black;
+	margin-bottom: 3px;
+	white-space: nowrap;
+	overflow: auto;
+	cursor: pointer;
+}
+div.player-name:hover{
+	background: darkgrey;
+}
+
+div#Player1.player{
+	left: 0;
+	border-right: 1px solid black;
+}
+div#Player2.player{
+	right: 0;
+	border-left: 1px solid black;
+}
+
+.player-score > button{
+	vertical-align: middle;
+	padding: 10px 15px;
+}
+
+.player-score > button:first-child{
+	float: left;
+	margin-left: 10px;
+}
+.player-score > button:last-child{
+	float: right;
+	margin-right: 10px;
+}
+
+app5-dialog.TimeSetterDialog{
+	min-width: 275px;
+	min-height: 150px;
+}
+app5-dialog.TimeSetterDialog > div.dialog-content{
+	font-size: 12pt;
+}
+div.TimeSetter{
+	font-size: 18pt;
+	padding: 10px;
+	margin: 7px;
+}
+
+app5-dialog#Results{
+	font-size: 18pt;
+	min-width: 450px;
+}
+app5-dialog#Results > div.dialog-content > h1{
+	margin-top: 0;
+	text-align: left;
+}
+
+app5-dialog#PropertySetter-Dialog, app5-dialog#TeamSetter-Dialog{
+	min-width: 300px;
+	min-height: 125px;
+}
+app5-dialog#PropertySetter-Dialog > div.dialog-content, app5-dialog#TeamSetter-Dialog > div.dialog-content{
+	font-size: 18pt;
+}
+app5-dialog#PropertySetter-Dialog > div.dialog-content > div#prp-set-wrapper, app5-dialog#TeamSetter-Dialog > div.dialog-content > div#tm-set-wrapper{
+	margin-top: 10px;
+}
+
+app5-dialog#PropertySetter-Dialog > div.dialog-content > div#prp-set-wrapper > div > input[type="text"], app5-dialog#TeamSetter-Dialog > div.dialog-content > div#tm-set-wrapper > div > input[type="text"]{
+	font-size: 18pt;
+	width: 150px;
+}
+app5-dialog#PropertySetter-Dialog > div.dialog-content > div#prp-set-wrapper > button, app5-dialog#TeamSetter-Dialog > div.dialog-content > div#tm-set-wrapper > button{
+	font-size: 18pt;
+	padding: 2px;
+	margin: 5px;
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+}
+
+app5-dialog#Intro{
+	width: 700px;
+	height: 450px;
+}
+
+app5-dialog#Intro > div.dialog-title{
+	font-weight: bold;
+	font-size: 14pt;
+}
+
+app5-dialog#LoginDialog{
+	min-width: 250px;
+	min-height: 175px;
+}
+
+app5-dialog#LoginDialog > div.dialog-content{
+	position: relative;
+	top: 12px;
+
+	font-weight: bold;
+	font-size: 18px;
+}
+
+app5-dialog#LoginDialog > div.dialog-content > form > button[type="Submit"]{
+	margin-top: 10px;
+	padding: 10px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+app5-dialog > div.dialog-content{
+	height: 90%;
+}
+
+div.title{
+	font-size: 18pt;
+	font-weight: bold;
+
+	margin-bottom: 20px;
+	padding: 0 30px;
+	height: 10%;
+}
+pre#instructions{
+	font-family: Courier, Arial, sans-serif;
+	font-size: 10pt;
+
+	text-align: left;
+
+	overflow: auto;
+
+	resize: none;
+	width: 99%;
+	margin: 0 0.5%;
+	height: calc( 80% - 20px );
+
+	background: white;
+}
+
+div.dialog-bottom-row{
+	display: inline-block;
+	height: 10%;
+}
+div.dialog-dsa{
+	height: 80%;
+	margin-top: 10px;
+}
+
+button.dialog-ok-button{
+	padding: 10px;
+	position: absolute;
+
+	bottom: 5px;
+	right: 15px;
+
+	border-radius: 5px;
+	border-style: solid;
+	border-color: darkgrey;
+	border-width: 1px;
+
+	cursor: pointer;
+
+	transition: right .25s ease-in-out, border-radius .25s ease-in-out;
+}
+button.dialog-ok-button:hover{
+	right: 5px;
+	border-radius: 15px;
+}
+
+div.score-row{
+	margin: 5px 0;
+}
+span.score{
+	font-weight: bold;
+}
+
+div.winner-row{
+	margin: 10px 0 5px 0;
+	border: 1px solid gold;
+	display: inline-block;
+}
+span.winner{
+	font-weight: bold;
+	color: gold;
+}
+
+span.time{
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+
+	cursor: pointer;
+}
+
+span.score{
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+
+	cursor: default;
+}
+
+.underline{
+	text-decoration: underline;
+}
+.margin-bottom{
+	margin-bottom: 5px;
+}
+
+footer{
+	display: none;
+	visibility: hidden;
+}
+
+table.form > tbody > tr > td:nth-child(odd){
+	text-align: right;
+}
+table.form > tbody > tr > td:nth-child(even){
+	text-align: left;
+}
+
+span.error{
+	font-weight: bold;
+	color: red;
+	margin-bottom: 5px;
+}
+
+.status-dialog{
+	min-width: 175px;
+}
+
+.status-dialog > .dialog-content{
+	padding: 5px;
+	height: auto;
+}
+
+.success{
+	color: green;
+	font-weight: bold;
+	margin: 2px;
+}
+
+.failure{
+	color: red;
+	font-weight: bold;
+	margin: 2px;
+}
+
+.ok{
+	padding: 5px 10px;
+	margin-top: 3px;
+	cursor: pointer;
+}
+
+#PromptDialog{
+	padding: 10px;
+}
+
+input[name="prompt"]{
+	padding: 5px;
+}
+
+label{
+	font-weight: bold;
+	margin-bottom: 5px;
+}

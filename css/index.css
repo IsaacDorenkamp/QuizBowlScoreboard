@@ -1,0 +1,80 @@
+html{
+	margin: 0px;
+}
+body{
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+body > app5-modal{
+	height: 100%;
+}
+
+div{
+	padding: 4px;
+}
+
+ul#actions{
+	list-style-type: none;
+	border-radius: 4px;
+	border: 2px solid white;
+	padding-left: 0;
+}
+
+li > a{
+	text-decoration: none !important;
+}
+li{
+	text-indent: 10px;
+	border-radius: 4px;
+	padding: 4px;
+	transition: background .25s ease-in-out;
+	-webkit-transition: background .25s ease-in-out;
+}
+li:hover{
+	background: gray;
+}
+li:hover > a{
+	color:black;
+}
+li:hover > a:active{
+	color: white;
+}
+
+
+a:link{
+	color: gray;
+	text-decoration: underline;
+	font-size: 18pt;
+}
+a:visited{
+	color: gray;
+}
+a:hover{
+	text-decoration: none;
+}
+a:active{
+	color: white;
+}
+
+div#app{
+	margin: 0;
+	padding: 0;
+	height: calc( 100% - 8px );
+	width: 100%;
+}
+
+div#sidebar{
+	float: left;
+	width: calc( 25% - 1px );
+	background: #555;
+	height: calc( 100% - 8px );
+	border-right: 1px solid black;
+}
+
+div#main{
+	height: 100%;
+	float: right;
+	width: 75%;
+}

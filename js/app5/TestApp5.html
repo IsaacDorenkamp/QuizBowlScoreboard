@@ -1,0 +1,83 @@
+<html>
+	<head>
+		<title>App5 Test Zone</title>
+		<style>
+			:unresolved{
+				opacity:0;
+			}
+			app5-tab-meta > app5-panel{
+				padding: 10px;
+			}
+		</style>
+		<script src="App5.js"></script>
+		<script>
+			var notif;
+			
+			function formatDate(date){
+				var day = date.getDate();
+				var month = date.getMonth() + 1; //0-11 need to add one for correct date
+				var year = date.getFullYear();
+				hours = date.getHours();
+				var minutes = date.getMinutes();
+				var seconds = date.getSeconds();
+				if( seconds.toString().length == 1 ){
+					seconds = "0"+seconds;
+				}
+				if( minutes.toString().length == 1 ){
+					minutes = "0"+minutes;
+				}
+				return day+"-"+month+"-"+year+" "+hours+":"+minutes+":"+seconds;
+			}
+			function init(){
+				var dyn = document.getElementById('dynamic');
+				var count = 0;
+				dyn.refresher = function(){
+					return formatDate( new Date() );
+				};
+				dyn.rate = 250;
+				
+				notif = document.getElementById('notification');
+			}
+			addEventListener('load',init);
+		</script>
+	</head>
+	<body>
+		<app5-tabpane>
+			<app5-tab-strip>
+				<app5-tab panel="Example-NotifDyn">Notifications, Dynamic Content</app5-tab>
+				<app5-tab panel="Text-Stuff">Text</app5-tab>
+				<app5-tab panel="Menu-Stuff">Menu Stuff</app5-tab>
+			</app5-tab-strip>
+			
+			<app5-tab-meta>
+				<app5-panel id="Example-NotifDyn">
+					<app5-notification id="notification">Date: <app5-dynamic id="dynamic"></app5-dynamic></app5-notification>
+					This example is about notifications! Yay!
+					<br />
+					<br />
+					<button onclick="notif.show()">Show <span id="funny">Date</span> as Notification</button>
+					<br />
+					*Demonstrates the use of a &lt;app5-dynamic&gt; within an &lt;app5-notification&gt;
+				</app5-panel>
+				<app5-panel id="Text-Stuff">
+					Hello, this text is awesome.
+				</app5-panel>
+				<app5-panel id="Menu-Stuff" style="width:95%;padding:0;margin:10px">
+					<app5-menubar>
+						<app5-menuref menu="lolz-menu">LOLZ</app5-menuref>
+						<app5-menuref menu="lolz2-menu">LOLZ v2.0</app5-menuref>
+					</app5-menubar>
+					<app5-menu-meta>
+						<app5-menu id="lolz-menu">
+							<app5-menu-item onclick="alert('You clicked me!')">MenuItem</app5-menu-item>
+							<app5-menu-item onclick="alert('You clicked me too!')">MenuItem v2.0</app5-menu-item>
+						</app5-menu>
+						<app5-menu id="lolz2-menu">
+							<app5-menu-item onclick="document.getElementById('funny').innerHTML = prompt('Type funny word or phrase here:')">Make Date Notification button funnier</app5-menu-item>
+						</app5-menu>
+					</app5-menu-meta>
+				</app5-panel>
+			</app5-tab-meta>
+		</app5-tabpane>
+	</body>
+</html>
