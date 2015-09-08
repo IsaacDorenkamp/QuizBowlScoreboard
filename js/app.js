@@ -1,14 +1,5 @@
 'use strict'
 
-const GLOBALS = {
-	SOCKET: {
-		'protocol': 'ws',
-		'universal_host': 'quizbowl.us',
-		'test_host': 'localhost',
-		'port': '9000'
-	}
-};
-
 //Angular side of everything
 
 var App = angular.module('scoreboard', [] );
@@ -19,7 +10,13 @@ App.directive( 'ngContextMenu', function($parse){
 		var fn = $parse( attrs.ngContextMenu );
 		element.bind( 'contextmenu', function( event ){
 			scope.$apply(function(){
-				event.preventDefault();
+				if( event.preventDefault ){
+					event.preventDefault();
+				}else if( event.stopPropagation ){
+					event.stopPropagation();
+				}else{
+					event.cancelBubble = true;
+				}
 				fn( scope, {$event:event} );
 			})
 		});
@@ -55,6 +52,9 @@ var socket;
 var Commander;
 
 function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
+	var input_pwd = "";
+	var correct_pwd = "";
+
 	$scope.Settings = {
 		GameTime: new RoundTime( 15 ),
 		TossupTime: new RoundTime( 0, 10 ),
@@ -67,7 +67,7 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 	$scope.Properties = {
 		Title: 'QB',
 		Room: 'Room',
-		Email: 'roy@roysmith.com',
+		Email: 'recipient@example.com',
 		Phone: ''
 	};
 	$scope.Property = 'Room';
@@ -128,17 +128,20 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 				$scope.Game.GID = gid;
 				$scope.Game.CID = cid;
 				$scope.Game.GameStarted = true;
+				correct_pwd = input_pwd;
 			}
 			return; //All's OK
 		}else if( inst.split('_')[0] === "ERR" ){
 			var error = Commander.getError(data.getInstruction());
 			$scope.$apply( function(){
-				$scope.Error = data.error;
+				$scope.Error = error;
+				console.log( $scope.Error );
 			} );
 			Application.FailureDialog.show();
 		}else if( inst === "ERROR" ){
 			$scope.$apply( function(){
 				$scope.Error = data.message;
+				console.log( $scope.Error );
 			} );
 			Application.FailureDialog.show();
 		}else if( inst == "CONFIRM_OVERRIDE" ){
@@ -176,7 +179,7 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 			for( var key in data ){
 				output += '\n' + key + ':' + data[key];
 			}
-
+			console.log( output );
 			return output;
 		},
 
@@ -200,17 +203,7 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 		},
 
 		getError: function( str, preface ){
-			if( !preface ) preface = "Error";
-			var err = str.split('_');
-
-			var words = [preface + ':'];
-			for( var i = 1; i < err.length; i++ ){
-				var period = (i == err.length - 1)?'.':'';
-
-				words.push( err[i][0].toUpperCase() + err[i].slice(1).toLowerCase() + period );
-			}
-
-			return words.join(' ');
+			return str.split_slice('_', 1);
 		}
 	};
 	$scope.Commander = Commander;
@@ -385,8 +378,6 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 		},
 
 		Create: function( other_pwd, progress_override ){
-			console.log( other_pwd );
-
 			if( this.GameStarted ){
 				Application.LoginDialog.close();
 				this.Alert( "Game already Created!", "Error" );
@@ -400,7 +391,16 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 			var form = Application.LoginForm;
 
 			var pwd  = other_pwd || form.elements["comp_pwd"].value;
+			input_pwd = pwd;
 			var aid  = form.elements["comp_access_id"].value;
+			console.log( aid );
+
+			if( pwd == "" || aid == "" ){
+				Application.LoginDialog.close();
+				Application.ProgressDialog.close();
+				this.Alert( "One or more form fields were left empty.", "Error" );
+				return;
+			}
 
 			meta['Team1_Name'] = $scope.Game.Team1.getName();
 			meta['Team2_Name'] = $scope.Game.Team2.getName();
@@ -490,25 +490,44 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 			return;
 		}
 
-		window.addEventListener('load', function(){
+		(function(){
 			$scope.$watch( 'Game.Team1.getScore()', function( oldval, newval ){
-				if( !socket_available ) return;
-
+				if( isNaN( $scope.Game.CID ) || isNaN( $scope.Game.GID ) ){
+					return;
+				}
+				console.log( $scope.Game.Team2.getScore() );
 				Commander.Send( 'SAVE_SCORE', {
-					'data': 'T1:' + $scope.Game.Team1.getScore()
+					'T1S': $scope.Game.Team1.getScore(),
+					'T2S': $scope.Game.Team2.getScore(),
+					'T1N': $scope.Game.Team1.getName(),
+					'T2N': $scope.Game.Team2.getName(),
+					'gid': $scope.Game.GID,
+					'comp': $scope.Game.CID,
+					'comp_pwd': correct_pwd
 				} );
 			});
 			$scope.$watch( 'Game.Team2.getScore()', function( oldval, newval ){
-				if( !socket_available ) return;
-				
+				if( isNaN( $scope.Game.CID ) || isNaN( $scope.Game.GID ) ){
+					return;
+				}
 				Commander.Send( 'SAVE_SCORE', {
-					'data': 'T2:' + $scope.Game.Team2.getScore()
+					'T1S': $scope.Game.Team1.getScore(),
+					'T2S': $scope.Game.Team2.getScore(), 
+					'T1N': $scope.Game.Team1.getName(),
+					'T2N': $scope.Game.Team2.getName(),
+					'gid': $scope.Game.GID,
+					'comp': $scope.Game.CID,
+					'comp_pwd': correct_pwd
 				} );
 			});
 			$scope.$on( 'destroy', function(){
-				Commander.Send( "END_GAME", {} );
+				Commander.Send( "END_GAME", {
+					'pwd': correct_pwd,
+					'cid': $scope.Game.CID,
+					'gid': $scope.Game.GID
+				} );
 			});	
-		});
+		})();
 	})();
 
 	

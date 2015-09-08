@@ -6,6 +6,7 @@
 		
 		<script src="App5.js"></script>
 		<script>
+			APP5_PATH = ".";
 			function closeWindow(){
 				var do_close = confirm('Are you sure you want to exit?');
 				if(do_close){
@@ -136,6 +137,7 @@
 			<app5-tab-strip id="TabStrip-1">
 				<app5-tab panel="grocery-list">Grocery List</app5-tab>
 				<app5-tab panel="todo">Todo List</app5-tab>
+				<app5-tab panel="ellipses">That annoying always-loading thingy</app5-tab>
 			</app5-tab-strip>
 			
 			<app5-tab-meta id="TabMeta-1">
@@ -148,6 +150,9 @@
 					<h1>To Do</h1>
 					<hr />
 					<ul id="todo-list"></ul>
+				</app5-panel>
+				<app5-panel id="ellipses">
+					Loading<app5-effect effect="Ellipses"</app5-effect>
 				</app5-panel>
 			</app5-tab-meta>
 		</app5-tabpane>

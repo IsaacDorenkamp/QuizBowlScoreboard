@@ -1,5 +1,5 @@
 var App5 = {
-	VERSION: 'v0.1',
+	VERSION: 'v1.2 Beta',
 	INIT_EXT: false,
 	Initializers: new Array(),
 	PREFIXES: new Array(
@@ -68,6 +68,30 @@ App5.InitEffects = function(){
 			var amtX = Math.round( (Math.random() * 10) - 5 );
 			var amtY = Math.round( (Math.random() * 10) - 5 );
 			App5.css(elem, "transform", "rotate("+rot+"deg) translate("+amtX+"px,"+amtY+"px)",-1);
+		}
+	}
+	App5.Effects.Ellipses = {
+		//Specific
+		amount: 0,
+		
+		//Universal
+		tickRate: 75,
+		setup: function(elem){},
+		tick: function(elem){
+			if( this.amount >= 3 ){
+				this.amount = 0;
+			}else{
+				this.amount++;
+			}
+
+			var self = this;
+			elem.innerHTML = (function(){
+				var output = '';
+				for( var i = 0; i < self.amount; i++ ){
+					output += '.';
+				}
+				return output;
+			})();
 		}
 	}
 }

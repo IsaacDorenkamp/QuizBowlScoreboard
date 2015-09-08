@@ -1,9 +1,9 @@
 <?php
 	class Validator{
-		static function Game( $mysqli, $room ){
-			$numrows = $mysqli -> query("SELECT * FROM `games` WHERE room='$room'") -> num_rows;
+		static function Game( $mysqli, $room, $comp ){
+			$res = $mysqli -> query("SELECT * FROM `$comp` WHERE room='$room'");
 
-			if( $numrows ){
+			if( $res && $res -> num_rows ){
 				return true;
 			}
 

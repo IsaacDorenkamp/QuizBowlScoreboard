@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html ng-app="watch">
+	<head>
+		<title>QuizBowl Competition Home</title>
+		<script src="js/app5/App5.js"></script>
+		<script src="js/global.js"></script>
+		<script src="js/angular.min.js"></script>
+		<script src="js/watch.js"></script>
+		<link rel="stylesheet" href="css/Universal.css" />
+		<link rel="stylesheet" href="css/watch.css" />
+	</head>
+	<body ng-controller="GameWatch">
+		<div id="title">QuizBowl -- Watching Competition <span id="title-comp" ng-bind-html="Competition || Loading"></span></div>
+		<div id="app">
+			<table>
+				<tbody>
+					<tr class="header">
+						<th>Game Name</th>
+						<th>Team One</th>
+						<th>Team Two</th>
+					</tr>
+					<tr ng-repeat="(name, scores) in Games" ng-class="{ flash: Games[name].updated }">
+						<td>{{ scores['Name'] + ' -- Game ' + name }}</td>
+						<td>{{ scores['T1N'] + ': ' + scores['T1S'] }}</td>
+						<td>{{ scores['T2N'] + ': ' + scores['T2S'] }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>

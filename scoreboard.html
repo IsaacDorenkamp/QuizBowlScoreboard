@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="css/Universal.css" />
 
 		<script src="js/app5/App5.js"></script>
+		<script src="js/global.js"></script>
 		<script src="js/core.js"></script>
 		<script src="js/angular.min.js"></script>
 		<script src="js/app.js"></script>
@@ -268,13 +269,14 @@
 					Failure
 				</div>
 				<div class="dialog-content">
-					<h1 class="failure"><span>Error: {{ Error || "Operation Failed." }}</span></h1>
+					<h1 class="failure"><span>Error: {{ Error?Error:"Operation Failed." }}</span></h1>
 					<button onclick="Application.FailureDialog.close()" class="ok">OK</button>
 				</div>
 			</app5-dialog>
 			<app5-dialog id="AlertDialog" class="status-dialog">
 				<div class="dialog-title">
 					{{ Details.Alert.Title }}
+					<a href="javascript:Application.AlertDialog.close()" class="dialog-closer">X</a>
 				</div>
 				<div class="dialog-content">
 					<h1>{{ Details.Alert.Message }}</h1>
@@ -284,6 +286,7 @@
 			<app5-dialog id="PromptDialog" class="status-dialog">
 				<div class="dialog-title">
 					{{ Details.Prompt.Title }}
+					<a href="javascript:Application.PromptDialog.close()" class="dialog-closer">X</a>
 				</div>
 				<div class="dialog-content">
 					<form id="PromptForm">

@@ -1,0 +1,70 @@
+body{
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+div#title{
+	text-align: center;
+	display: block;
+	font-size: 24px;
+	font-weight: bold;
+}
+span#title-comp{
+	color: lime;
+}
+
+div#app{
+	text-align: center;
+}
+
+table{
+	display: block;
+	clear:both;
+	margin: 20px;
+	border-radius: 4px;
+	border: 1px solid black;
+}
+tbody{
+	display: block;
+}
+tr{
+	border-radius: 10px;
+	margin: 5px;
+	padding: 5px;
+	display: block;
+	text-align: center;
+}
+tr:nth-child(even){
+	background: #999;
+}
+tr.header{
+	border-bottom: 1px solid black;
+	border-radius: 0;
+	padding: 0;
+	margin-bottom: 15px;
+}
+td, th{
+	display: inline-block;
+	margin: 0 15px;
+	font-size: 24pt;
+
+	text-align: left;
+	width: 30%;
+	text-indent: 10%;
+}
+th{
+	padding: 5px;
+	margin: 0 5px;
+}
+
+@keyframes updated{
+	from{ background: orange; }
+	to{ background: inherit; }
+}
+
+tr.flash{
+	background-color: orange;
+	animation: updated 1.75s;
+	-webkit-animation: updated 1.75s;
+}
