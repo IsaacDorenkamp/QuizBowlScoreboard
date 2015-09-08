@@ -67,7 +67,11 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 	$scope.Properties = {
 		Title: 'QB',
 		Room: 'Room',
+<<<<<<< HEAD
 		Email: 'recipient@example.com',
+=======
+		Email: '',
+>>>>>>> origin/master
 		Phone: ''
 	};
 	$scope.Property = 'Room';
