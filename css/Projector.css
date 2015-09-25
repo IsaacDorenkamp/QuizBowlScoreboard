@@ -1,22 +1,5 @@
 /* Special Style overrides for 1024 x 768 Size Screens */
 
-div#GameClock, div#QuestionClock{
-    font-size: 72pt;
-    margin-top: 30px;
-}
-
-div#buttons{
-    padding-top: 30px;
-    padding-left: 30px;
-    height: calc( 100% - 34px );
-}
-div#buttons > button{
-    font-weight: bold;
-    font-size: 24pt;
-    height: 90px;
-    width: 90px;
-    margin-right: 25px;
-}
 #timer-info{
     display: none;
     visibility: hidden;

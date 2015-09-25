@@ -122,6 +122,7 @@ abstract class WebSocketServer {
               default:
 
                 $this->stderr('Socket error: ' . socket_strerror($sockErrNo));
+                $this->disconnect($socket, true);
             }
             
           }

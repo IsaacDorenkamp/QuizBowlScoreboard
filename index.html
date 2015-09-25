@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="cmgr" ng-controller="Manager">
 	<head>
 		<title>QuizBowl Competition Home</title>
 		<script src="js/app5/App5.js"></script>
+		<script src="js/angular.min.js"></script>
 		<script src="js/global.js"></script>
 		<script src="js/gcore.js"></script>
 		<link rel="stylesheet" href="css/Universal.css" />
@@ -28,11 +29,20 @@
 		<app5-modal>
 			<app5-dialog id="CreateCompetition">
 				<div class="dialog-title">
-					Create a Competition
-					<a href="javascript:Application.CreateDialog.close()" class="dialog-closer">X</a>
+					Create Competition
+					<a href="javascript:Application.CreateDialog.close()" class="dialog-closer"><img src="img/x.png" alt="X" /></a>
 				</div>
 				<div class="dialog-content">
-					
+					<form ng-submit="CreateCompetition">
+						<table>
+							<tbody>
+								<tr><td>Competition Name:&nbsp;</td><td><input type="text" ng-model="Competition.Name" /></td></tr>
+								<tr><td>Competition Password:&nbsp;</td><td><input type="password" ng-model="Competition.Password" /></td></tr>
+								<tr><td colspan="2">Private Competition*?&nbsp;<input type="checkbox" ng-model="Competition.Private" /></td></tr>
+								<tr ng-class="{ disabled: !Competition.Private }"><td>View Key**:</td><td><input type="password" ng-disabled="!Competition.Private" ng-required="Competition.Private" ng-model="ViewKey" /></td></tr>
+							</tbody>
+						</table>
+					</form>
 				</div>
 			</app5-dialog>
 		</app5-modal>

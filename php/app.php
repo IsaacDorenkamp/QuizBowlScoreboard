@@ -35,7 +35,7 @@
 		}
 	}
 
-	$server = new Scoreboard_Server( '0.0.0.0', '9000' );
+	$server = new Scoreboard_Server( '0.0.0.0', '8080' );
 
 	try{
 		$server -> run();

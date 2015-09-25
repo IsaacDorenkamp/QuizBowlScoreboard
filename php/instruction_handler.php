@@ -67,15 +67,26 @@
 				}
 
 				//Validator functions return true if the item (e.g. a game) already exists in the database.
-				if( Validator::Game( $mysqli, $gnm, $access_id ) && !$override ){
-					return "CONFIRM_OVERRIDE\n"
+				if( Validator::Game( $mysqli, $gnm, $access_id ) ){
+					if( !$override ){
+						return "CONFIRM_OVERRIDE\n"
 						  ."message: Game in room $gnm already exists.\nIf you wish to proceed with this action, enter\nthe competition password here and hit OK.";
+					}else{
+						$query = "UPDATE `$access_id` SET Team1_Name='$t1n', Team2_Name='$t2n', Team1_Score=0, Team2_Score=0 WHERE room=$gnm";
+
+						$mysqli -> query( $query );
+
+						if( $mysqli -> error ) return "ERROR\n" . "message: " . $mysqli -> error;
+
+						return "OK";
+					}
 				}
 
-				$query = "INSERT INTO `$access_id` VALUES ( '$t1n', '$t2n', 0, 0, $comp_id, '$gnm', '' )";
+				$query = "INSERT INTO `$access_id` VALUES ( '$t1n', '$t2n', 0, 0, $comp_id, '$gnm', 0, '' )";
 
+				$mysqli -> query( $query );
 
-				if( $mysqli -> error ) return ERR_DB . $mysqli -> error;
+				if( $mysqli -> error ) return "ERROR\n" . "message: " . $mysqli -> error;
 
 				$for="login";
 
@@ -88,7 +99,9 @@
 												  ."T1S:0\n"
 												  ."T2S:0\n"
 												  ."T1N:$t1n\n"
-												  ."T2N:$t2n" );
+												  ."T2N:$t2n\n"
+												  ."access_id:$access_id\n"
+												  ."finished:false" );
 
 				$this -> process_watch_instruction( $usepi, $sock );
 
@@ -128,7 +141,7 @@
 				$for="saving";
 
 				break;
-			case 'FINZALIZE':
+			case 'FINALIZE':
 				$pwd = GetSafeValue($data, 'pwd');
 				$gid = GetSafeValue($data, 'gid');
 				$cid = GetSafeValue($data, 'cid');
@@ -142,14 +155,15 @@
 
 				if( !password_verify( $pwd, $password ) ){
 					return "ERROR\n"
-						  ."message: Invalid password for competiton\n#$cid; will not finalize scores.";
+						  ."message: Invalid password for competition\n#$cid; will not finalize scores.";
 
 				}
 
-				$query = "INSERT INTO `finished_games` VALUES SELECT * FROM `games` WHERE gid=$gid;\n"
-						."DELETE FROM `$access_id` WHERE gid=$gid";
+				$query = "UPDATE `$access_id` SET finished=1 WHERE gid=$gid\n";
 
 				$mysqli -> query( $query );
+
+				$this -> process_watch_instruction( $pi, $sock );
 
 				$for = "finalizing";
 			case 'ECHO':
@@ -187,8 +201,11 @@ OUTPUT;
 
 			$mysqli = new mysqli( HOST, USER, PASSWORD, SB_DATABASE );
 
+			$message = 'SCORE_UPDATE';
+
 			switch( $instruction ){
 			case 'CREATE_GAME':
+				$message = 'NEW_GAME';
 			case 'SAVE_SCORE':     //Propogated from process_instruction
 				$t1s = GetSafeValue($data, 'T1S');
 				$t2s = GetSafeValue($data, 'T2S');
@@ -196,9 +213,36 @@ OUTPUT;
 				$t2n = GetSafeValue($data, 'T2N');
 				$gid = GetSafeValue($data, 'gid');
 
-				$message = "SCORE_UPDATE\nGame_{$gid}\n{$gid}_T1S:$t1s\n{$gid}_T2S:$t2s\n{$gid}_T1N:$t1n\n{$gid}_T2N:$t2n";
+				$room = "";
+
+				if( $message == 'NEW_GAME' ){
+					$aid = GetSafeValue($data, 'access_id');
+					if( !$aid ){
+						return "OK"; //The client doesn't really care.
+					}
+					$res = $mysqli -> query( "SELECT room FROM `$aid` WHERE gid=$gid" );
+					if( !$res ){
+						return "OK"; //Same as above; the client doesn't really care.
+					}
+
+					$row = $res -> fetch_assoc();
+					$room = $row['room'];
+				}
+
+				$message = "SCORE_UPDATE\nGame_{$gid}:$room\n{$gid}_T1S:$t1s\n{$gid}_T2S:$t2s\n{$gid}_T1N:$t1n\n{$gid}_T2N:$t2n";
+
 				foreach( $this -> watching as $index => $client ){
 					$this -> server -> send_data( $client['USER'], $message );  //$this -> server -> send() is protected.
+				}
+				break;
+			case 'FINALIZE':
+				$gid = GetSafeValue($data, 'gid');
+				$cid = GetSafeValue($data, 'cid');
+
+				$message = "GAME_OVER\ngid:{$gid}";
+
+				foreach( $this -> watching as $index => $client ){
+					$this -> server -> send_data( $client['USER'], $message );
 				}
 				break;
 			case 'WATCH':
@@ -225,8 +269,7 @@ OUTPUT;
 					$gpwd = GetSafeValue($data, 'pwd');
 
 					if( password_verify( $gpwd, $cpwd ) ){
-						return "AUTHENTICATE\n"
-							  ."status: 1";    //status: 1 means that a correct password has been given.
+						//Do nothing
 					}else{
 						return "AUTHENTICATE\n"
 						      ."status: -1";   //status: -1 means an incorrect password has been given.
@@ -262,6 +305,7 @@ OUTPUT;
 							  .$gid."_T2S:" . $row["Team2_Score"] . "\n"
 							  .$gid."_T1N:" . $row["Team1_Name"] . "\n"
 							  .$gid."_T2N:" . $row["Team2_Name"] . "\n"
+							  .$gid."_Finished:" . (($row["finished"]=="1")?"true":"false") . "\n"
 							  .$gid."_Name:" . $room . "\n";
 				}while( $row = $result -> fetch_assoc() );
 

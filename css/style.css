@@ -90,10 +90,11 @@ div#bottom-left{
 
 	height: 100%;
 	float: left;
+
+	white-space: nowrap;
+	overflow: auto;
 }
 div#bottom-right{
-	padding-left: 15px;
-
 	width: 40%;
 
 	text-align: center;
@@ -113,13 +114,21 @@ div#buttons{
 
 	margin: 0 auto;
 	padding-top: 15px;
+
+	white-space: nowrap;
+	overflow: auto;
 }
 div#buttons > button{
 	font-weight: bold;
 	font-size: 24pt;
-	height: 125px;
-	width: 125px;
+	height: 70px;
+	width: 70px;
+	border-radius: 35px;
 	margin-right: 12px;
+
+	margin-top: 35px;
+	cursor: pointer;
+	border: none;
 }
 div#buttons > div, div#buttons > div > ul{
 	display: inline-block;
@@ -226,10 +235,24 @@ div#Player2.player{
 }
 
 .player-score > button{
-	vertical-align: middle;
-	padding: 10px 15px;
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
+	border: none;
+
+	margin-top: 10px;
+
+	font-size: 12pt;
+
+	cursor: pointer;
 }
 
+.player-score{
+	font-size: 42pt;
+}
+.player-score > button{
+	font-size: 12pt;
+}
 .player-score > button:first-child{
 	float: left;
 	margin-left: 10px;
@@ -296,16 +319,26 @@ app5-dialog#Intro > div.dialog-title{
 }
 
 app5-dialog#LoginDialog{
-	min-width: 250px;
+	min-width: 400px;
 	min-height: 175px;
 }
 
 app5-dialog#LoginDialog > div.dialog-content{
-	position: relative;
-	top: 12px;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	top: 25px;
+	height: auto;
 
 	font-weight: bold;
 	font-size: 18px;
+}
+app5-dialog#LoginDialog > div.dialog-content > form{
+	margin: 20px auto 0 auto;
+}
+app5-dialog#LoginDialog > div.dialog-content > form > table{
+	width: 100%;
 }
 
 app5-dialog#LoginDialog > div.dialog-content > form > button[type="Submit"]{
@@ -425,6 +458,9 @@ table.form > tbody > tr > td:nth-child(odd){
 table.form > tbody > tr > td:nth-child(even){
 	text-align: left;
 }
+table.form > tbody > tr > td{
+	white-space: nowrap;
+}
 
 span.error{
 	font-weight: bold;
@@ -433,7 +469,7 @@ span.error{
 }
 
 .status-dialog{
-	min-width: 175px;
+	min-width: 225px;
 }
 
 .status-dialog > .dialog-content{

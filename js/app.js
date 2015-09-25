@@ -67,11 +67,7 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 	$scope.Properties = {
 		Title: 'QB',
 		Room: 'Room',
-<<<<<<< HEAD
 		Email: 'recipient@example.com',
-=======
-		Email: '',
->>>>>>> origin/master
 		Phone: ''
 	};
 	$scope.Property = 'Room';
@@ -139,13 +135,11 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 			var error = Commander.getError(data.getInstruction());
 			$scope.$apply( function(){
 				$scope.Error = error;
-				console.log( $scope.Error );
 			} );
 			Application.FailureDialog.show();
 		}else if( inst === "ERROR" ){
 			$scope.$apply( function(){
 				$scope.Error = data.message;
-				console.log( $scope.Error );
 			} );
 			Application.FailureDialog.show();
 		}else if( inst == "CONFIRM_OVERRIDE" ){
@@ -166,50 +160,8 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 		console.log( "Socket closed." );
 	}
 
-	Commander = {
-		Send: function( instruction, data ){
-			if( !socket_available ){
-				console.error( "Socket not available." );
-				return;
-			}
-			console.log( "Socket is available." );
-
-			var instruction = this.CreateInstruction( instruction, data );
-			socket.send( instruction );
-		},
-
-		CreateInstruction: function( instruction, data ){
-			var output = instruction;
-			for( var key in data ){
-				output += '\n' + key + ':' + data[key];
-			}
-			console.log( output );
-			return output;
-		},
-
-		Parse: function( raw ){
-			var lines = raw.split("\n");
-
-			var instruction = lines[0].trim();
-
-			var data = {};
-			for( var lineno = 1; lineno < lines.length; lineno++ ){
-				var line = lines[lineno];
-				var key = line.split( ':' )[0];
-				var value = (line.split(':').slice(1).join(':')).trim();
-
-				data[key] = value;
-			}
-
-			data.getInstruction = function(){ return instruction };
-
-			return data;
-		},
-
-		getError: function( str, preface ){
-			return str.split_slice('_', 1);
-		}
-	};
+	Commander = new WebsocketCommander( socket );
+	console.log( Commander );
 	$scope.Commander = Commander;
 
 	$scope.Game = {
@@ -275,7 +227,6 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 				if( self.GameTime.decis == 0){
 					if( self.GameTime.seconds == 0 ){
 						if( self.GameTime.minutes == 0 ){
-							self.ResetTimer();
 							Application.Warn( Audio.MatchOver );
 							if( $scope.Settings.DoResults )
 								Application.Results.show();
@@ -397,8 +348,6 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 			var pwd  = other_pwd || form.elements["comp_pwd"].value;
 			input_pwd = pwd;
 			var aid  = form.elements["comp_access_id"].value;
-			console.log( aid );
-
 			if( pwd == "" || aid == "" ){
 				Application.LoginDialog.close();
 				Application.ProgressDialog.close();
@@ -434,6 +383,7 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 				};
 
 				Commander.Send( 'FINALIZE', meta );
+				console.log("Ending");
 			}, 'password' );
 		},
 
@@ -499,7 +449,6 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 				if( isNaN( $scope.Game.CID ) || isNaN( $scope.Game.GID ) ){
 					return;
 				}
-				console.log( $scope.Game.Team2.getScore() );
 				Commander.Send( 'SAVE_SCORE', {
 					'T1S': $scope.Game.Team1.getScore(),
 					'T2S': $scope.Game.Team2.getScore(),

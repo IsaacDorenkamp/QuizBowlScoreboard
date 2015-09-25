@@ -8,9 +8,19 @@
 		<script src="js/watch.js"></script>
 		<link rel="stylesheet" href="css/Universal.css" />
 		<link rel="stylesheet" href="css/watch.css" />
+		<link rel="stylesheet" href="css/ui.css" />
 	</head>
 	<body ng-controller="GameWatch">
-		<div id="title">QuizBowl -- Watching Competition <span id="title-comp" ng-bind-html="Competition || Loading"></span></div>
+		<div id="menu-button" ng-click="MenuShowing = !MenuShowing"></div>
+		<div id="sidebar-menu" ng-class="{ 'visible': MenuShowing }">
+			<h1 class="title">QuizBowl TV</h1>
+			<ul>
+				<li>Show completed games? <input type="checkbox" ng-model="ShowAll" class="ui" /></li>
+			</ul>
+		</div>
+		<div id="title">
+			QuizBowl -- Watching Competition <span id="title-comp" ng-bind-html="Competition || Loading"></span>
+		</div>
 		<div id="app">
 			<table>
 				<tbody>
@@ -19,13 +29,32 @@
 						<th>Team One</th>
 						<th>Team Two</th>
 					</tr>
-					<tr ng-repeat="(name, scores) in Games" ng-class="{ flash: Games[name].updated }">
-						<td>{{ scores['Name'] + ' -- Game ' + name }}</td>
-						<td>{{ scores['T1N'] + ': ' + scores['T1S'] }}</td>
-						<td>{{ scores['T2N'] + ': ' + scores['T2S'] }}</td>
+				</tbody>
+				<tbody>
+					<tr ng-repeat="(name, scores) in Games" ng-class="{ 'completed': scores.Finished, 'flash': scores.SU }" ng-show="!scores.Finished || ShowAll">
+						<td ng-resize-text>{{ scores['Name'] + ' -- Game ' + name }}</td>
+						<td ng-resize-text>{{ scores['T1N'] + ': ' + scores['T1S'] }}</td>
+						<td ng-resize-text>{{ scores['T2N'] + ': ' + scores['T2S'] }}</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
+
+		<app5-modal>
+			<app5-dialog id="auth">
+				<div class="dialog-title">
+					Authentication
+					<a class="dialog-closer" href="javascript: Application.Authentication.close()"><img src="img/x.png" alt="X" class="x"></img></a>
+				</div>
+				<div class="dialog-content">
+					<h2>Authentication required to proceed.</h2>
+					<div ng-show="Error" class="error">{{ "Error: " + Error }}</div>
+					<label>Password:</label><input type="password" ng-model="password" ng-keydown="CheckKey( $event )" />
+					<div>
+						<button ng-click="Watch()">OK</button>
+					</div>
+				</div>
+			</app5-dialog>
+		</app5-modal>
 	</body>
 </html>

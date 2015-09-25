@@ -7,6 +7,8 @@
 		<meta http-equiv="Expires" content="-1" />
 		<link rel="stylesheet" href="css/Universal.css" />
 
+		<link rel="stylesheet" href="css/ui.css" />
+
 		<script src="js/app5/App5.js"></script>
 		<script src="js/global.js"></script>
 		<script src="js/core.js"></script>
@@ -226,7 +228,7 @@
 			<app5-dialog id="LoginDialog">
 				<div class="dialog-title">
 					Log In to Competition
-					<a href="javascript:Application.LoginDialog.close()" class="dialog-closer">X</a>
+					<a href="javascript:Application.LoginDialog.close()" class="dialog-closer"><img src="img/x.png" alt="X" /></a>
 				</div>
 				<div class="dialog-content">
 					<form action="#" method="POST" onsubmit="App5.consume( event )" ng-submit="Game.Create( Application.LoginForm )" id="LoginForm">
@@ -237,7 +239,7 @@
 									<td><input type="text" name="comp_access_id" /></td>
 								</tr>
 								<tr>
-									<td>Competition Password:</td>
+									<td>Password:</td>
 									<td><input type="password" name="comp_pwd" /></td>
 								</tr>
 							</tbody>
@@ -276,7 +278,7 @@
 			<app5-dialog id="AlertDialog" class="status-dialog">
 				<div class="dialog-title">
 					{{ Details.Alert.Title }}
-					<a href="javascript:Application.AlertDialog.close()" class="dialog-closer">X</a>
+					<a href="javascript:Application.AlertDialog.close()" class="dialog-closer"><img src="img/x.png" alt="X" /></a>
 				</div>
 				<div class="dialog-content">
 					<h1>{{ Details.Alert.Message }}</h1>
@@ -286,7 +288,7 @@
 			<app5-dialog id="PromptDialog" class="status-dialog">
 				<div class="dialog-title">
 					{{ Details.Prompt.Title }}
-					<a href="javascript:Application.PromptDialog.close()" class="dialog-closer">X</a>
+					<a href="javascript:Application.PromptDialog.close()" class="dialog-closer"><img src="img/x.png" alt="X" /></a>
 				</div>
 				<div class="dialog-content">
 					<form id="PromptForm">
