@@ -10,12 +10,17 @@
 		<link rel="stylesheet" href="css/watch.css" />
 		<link rel="stylesheet" href="css/ui.css" />
 	</head>
-	<body ng-controller="GameWatch">
+	<body ng-controller="GameWatch" class="ui">
 		<div id="menu-button" ng-click="MenuShowing = !MenuShowing"></div>
 		<div id="sidebar-menu" ng-class="{ 'visible': MenuShowing }">
 			<h1 class="title">QuizBowl TV</h1>
 			<ul>
 				<li>Show completed games? <input type="checkbox" ng-model="ShowAll" class="ui" /></li>
+				<li>
+					Sort Games By:
+					<select ng-model="SortBy" ng-options="item[0] as item[1] for item in OPTIONS" class="SortBy">
+					</select>
+				</li>
 			</ul>
 		</div>
 		<div id="title">
@@ -31,8 +36,8 @@
 					</tr>
 				</tbody>
 				<tbody>
-					<tr ng-repeat="(name, scores) in Games" ng-class="{ 'completed': scores.Finished, 'flash': scores.SU }" ng-show="!scores.Finished || ShowAll">
-						<td ng-resize-text>{{ scores['Name'] + ' -- Game ' + name }}</td>
+					<tr ng-repeat="(name, scores) in Games | objectSort:SortBy:false" ng-class="{ 'completed': scores.Finished, 'flash': scores.SU }" ng-show="!scores.Finished || ShowAll">
+						<td ng-resize-text>{{ scores['Name'] + ' -- Game ' + scores['GID'] }}</td>
 						<td ng-resize-text>{{ scores['T1N'] + ': ' + scores['T1S'] }}</td>
 						<td ng-resize-text>{{ scores['T2N'] + ': ' + scores['T2S'] }}</td>
 					</tr>

@@ -28,6 +28,20 @@ App.directive( 'ngResizeText', ['$timeout', function($timeout){
 	}
 }] );
 
+App.filter( 'objectSort', function(){
+	return function( items, field, reverse ){
+		var filtered = [];
+		angular.forEach( items, function(item){
+			filtered.push( item );
+		} );
+		filtered.sort( function( a, b ){
+			return (parseInt(a[field]) > parseInt(b[field]) ? 1 : -1);
+		} );
+		if(reverse) filtered.reverse();
+		return filtered;
+	}
+} );
+
 function PQ(){
 	var qs = location.search;
 	qs = qs.substring(1);
@@ -54,6 +68,9 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 	var showing_auth = false;
 
 	$scope.MenuShowing = false;
+
+	$scope.OPTIONS = [ ["GID", "Game ID"], ["T1S","Team One's Score"], ["T2S","Team Two's Score"] ];
+	$scope.SortBy = $scope.OPTIONS[0][0];
 
 	$scope.Games = {};
 	$scope.Competition = "";
