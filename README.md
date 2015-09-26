@@ -4,7 +4,7 @@ A useful QuizBowl scoreboard web app using AngularJS, PHP Websockets (instead of
 Setup
 =================================================================================
 
-1. Be sure your server supports websocket connections on port 9000.
+1. Be sure your server supports websocket connections on port 8080.
 2. If so, upload the QuizBowlScoreboard folder to your server.
 3. Through SSH, start app.php in the php directory.
 4. You may now use the scoreboard web application to connect to the competition database system.
