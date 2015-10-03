@@ -35,6 +35,9 @@ input[type="text"]:focus, input[type="password"]:focus{
 	border-color: skyblue;
 }
 
+button{
+	padding: 8px;
+}
 button[type="submit"]{
 	border: 1px solid gray;
 	border-radius: 4px;
@@ -51,6 +54,9 @@ select{
 	cursor: pointer;
 
 	padding: 5px;
+	padding-right: 30px;
+
+	overflow-x: hidden;
 
 	position: relative;
 

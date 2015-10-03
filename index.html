@@ -1,50 +1,22 @@
 <!DOCTYPE html>
-<html ng-app="cmgr" ng-controller="Manager">
+<html ng-app="home" ng-controller="Manager">
 	<head>
-		<title>QuizBowl Competition Home</title>
-		<script src="js/app5/App5.js"></script>
-		<script src="js/angular.min.js"></script>
-		<script src="js/global.js"></script>
-		<script src="js/gcore.js"></script>
+		<title>quizbowl.us home</title>
 		<link rel="stylesheet" href="css/Universal.css" />
 		<link rel="stylesheet" href="css/index.css" />
+
+		<script src="js/angular.min.js"></script>
+		<script src="js/index.js"></script>
 	</head>
 	<body>
 		<div id="app">
-			<div id="sidebar">
-				<h1>QuizBowl Scoreboard</h1>
-				<hr />
-				<ul id="actions">
-					<li><a href="javascript:Application.CreateDialog.show()">Create a Competition</a></li>
-					<li><a href="javascript:void()">Watch a Competition</a></li>
-					<hr />
-					<li><a href="scoreboard.html">Use the scoreboard!</a></li>
+			<div id="menu-button" ng-click="MenuShowing = !MenuShowing"></div>
+			<div id="sidebar-menu" ng-class="{ visible: MenuShowing }">
+				<h3 class="title">quizbowl.us home</h3>
+				<ul>
+					<li>Hi</li>
 				</ul>
 			</div>
-			<div id="main">
-
-			</div>
 		</div>
-
-		<app5-modal>
-			<app5-dialog id="CreateCompetition">
-				<div class="dialog-title">
-					Create Competition
-					<a href="javascript:Application.CreateDialog.close()" class="dialog-closer"><img src="img/x.png" alt="X" /></a>
-				</div>
-				<div class="dialog-content">
-					<form ng-submit="CreateCompetition">
-						<table>
-							<tbody>
-								<tr><td>Competition Name:&nbsp;</td><td><input type="text" ng-model="Competition.Name" /></td></tr>
-								<tr><td>Competition Password:&nbsp;</td><td><input type="password" ng-model="Competition.Password" /></td></tr>
-								<tr><td colspan="2">Private Competition*?&nbsp;<input type="checkbox" ng-model="Competition.Private" /></td></tr>
-								<tr ng-class="{ disabled: !Competition.Private }"><td>View Key**:</td><td><input type="password" ng-disabled="!Competition.Private" ng-required="Competition.Private" ng-model="ViewKey" /></td></tr>
-							</tbody>
-						</table>
-					</form>
-				</div>
-			</app5-dialog>
-		</app5-modal>
 	</body>
 </html>

@@ -30,6 +30,11 @@
 				
 				$success = mail( $addr, 'QuizBowl Notification', $cont, 'From: notifications@quizbowl.us'  );
 				break;
+
+			//BE SURE WHEN ADDING COMPETITION CREATING TO SEND NEW COMPETITION TO CLIENTS TO ADD TO LIST!!!!!//
+			//Also make sure to remove competitions that are removed for some strange reason...//
+			//Finally, make sure to use NodeJS next time. I only used PHP because the original hosting plan didn't support NodeJS.//
+			//Little did I know we would need the Virtual Server plan anyway for the Websocket server! This is my programming sob story.//
 			case 'CREATE_GAME':
 				$gnm     = $mysqli -> real_escape_string( GetSafeValue($data, 'room') );
 				$comp_pwd    = $mysqli -> real_escape_string( GetSafeValue($data, 'password') );
@@ -149,7 +154,11 @@
 				unset( $games[$gid] );
 
 				$row = $mysqli -> query( 'SELECT * FROM `competitions` WHERE cid=$cid' );
-				$row = mysqli_fetch_assoc( $row );  //Makes things easier for us to just use the same variable here
+				if( !$row ){
+					return "ERROR\n"
+						  ."message: No competition with that ID was found!";
+				}
+				$row = $row -> fetch_assoc();  //Makes things easier for us to just use the same variable here
 				$password = $row['pwd'];
 				$access_id = $row['access_id'];
 
@@ -166,6 +175,7 @@
 				$this -> process_watch_instruction( $pi, $sock );
 
 				$for = "finalizing";
+				break;
 			case 'ECHO':
 				//Testing scenarios
 				return GetSafeValue($data, 'data');
@@ -247,6 +257,7 @@ OUTPUT;
 				break;
 			case 'WATCH':
 				$comp = GetSafeValue( $data, 'competition' );
+
 				if( $comp == '' ){
 					return "ERROR\n"
 						  ."message: No room specified.";
@@ -292,8 +303,8 @@ OUTPUT;
 
 				$config = "name: $cname\n";
 
-				if( !$result ){
-					return "OK";
+				if( $result -> num_rows == 0 ){
+					return "INITIALIZE\n" . $config;
 				}
 
 				$row = $result -> fetch_assoc();
@@ -311,10 +322,24 @@ OUTPUT;
 
 				return "INITIALIZE\n"
 					  .$config;
+			case 'LIST_COMPETITIONS':
+				$query = "SELECT * FROM `competitions` WHERE is_public=1";
+				$results = $mysqli -> query( $query );
+
+				if( !$results ){
+					return "NO_COMPETITIONS";
+				}
+
+				$output = "POPULATE_CLIST";
+
+				while( ($row = $results -> fetch_assoc()) ){
+					$output .= "\n" . $row['access_id'] . ":" . $row['name'];
+				}
+
+				return $output;
 			case 'UNWATCH':
 				foreach( $this -> watching as $key => $value ){
 					if( $value["USER"] -> id == $sock -> id ){
-						echo "Client Unwatching Competition.";
 						unset( $this -> watching[$key] );
 					}
 				}

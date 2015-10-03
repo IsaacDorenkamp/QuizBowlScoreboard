@@ -21,6 +21,9 @@
 					<select ng-model="SortBy" ng-options="item[0] as item[1] for item in OPTIONS" class="SortBy">
 					</select>
 				</li>
+				<li>
+					Change Competition: <select ng-model="NewCompetition" ng-options="item[0] as item[1] for item in Competitions"></select><button ng-click="SwitchCompetitions()">Watch</button>
+				</li>
 			</ul>
 		</div>
 		<div id="title">
@@ -36,6 +39,9 @@
 					</tr>
 				</tbody>
 				<tbody>
+					<tr ng-if="!Games">
+						<td class="unique full placeholder">~No games in this competition yet.~</td>
+					</tr>
 					<tr ng-repeat="(name, scores) in Games | objectSort:SortBy:false" ng-class="{ 'completed': scores.Finished, 'flash': scores.SU }" ng-show="!scores.Finished || ShowAll">
 						<td ng-resize-text>{{ scores['Name'] + ' -- Game ' + scores['GID'] }}</td>
 						<td ng-resize-text>{{ scores['T1N'] + ': ' + scores['T1S'] }}</td>

@@ -65,6 +65,10 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 	var qu     = PQ();
 	const COMP = qu['competition'];
 
+	if( !COMP ){
+		location.assign( 'index.html' );
+	}
+
 	var showing_auth = false;
 
 	$scope.MenuShowing = false;
@@ -75,6 +79,13 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 	$scope.Games = {};
 	$scope.Competition = "";
 	$scope.CID = "";
+
+	$scope.Competitions = [];
+	$scope.NewCompetition = COMP;
+
+	$scope.SwitchCompetitions = function(){
+		location.search = "competition=" + encodeURIComponent($scope.NewCompetition);
+	};
 
 	$scope.ShowAll = true;
 
@@ -88,13 +99,46 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 		Commander.Send( 'WATCH', {
 			competition: COMP
 		} );
+
+		Commander.Send( 'LIST_COMPETITIONS', {} );
 	};
 	socket.onmessage = function(evt){
 		var data = Commander.Parse( evt.data );
 
 		console.log( data );
+		console.log( data.getInstruction() );
 
 		switch( data.getInstruction() ){
+		case 'NO_COMPETITIONS':
+			$scope.Competitions = [];
+			//Nothing to do here; we have what we need.
+			break;
+		case 'POPULATE_CLIST':
+			$scope.Competitions = [];
+			for( key in data ){
+				if( key == 'getInstruction' ) continue;
+				$scope.Competitions.push( [key, data[key]] );
+			}
+			if( $scope.Competitions.length ) $scope.NewCompetition = $scope.Competitions[0][0];
+			console.log( $scope.NewCompetition );
+			break;
+		case 'ADD_C':
+			var aid = data['access_id'] || null;
+			var cnm = data['name'] || null;
+
+			if( aid && cnm ){
+				$scope.Competitions[aid] = cnm;
+				if( !$scope.$$phase ){
+					$scope.$digest();
+				}
+			}
+			break;
+		case 'REMOVE_C':
+			var aid = data['access_id'] || null;
+			if( aid ){
+				delete $scope.Competitions[aid];
+			}
+			break;
 		case 'INITIALIZE':
 			$timeout( function(){
 				$scope.Competition = $sce.trustAsHtml(data['name']);
@@ -120,7 +164,7 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 								Name: data['Game_' + gnm],
 								GID: gnm,
 								SU: (data.getInstruction()!='INITIALIZE'), //SU stands for "Score Updated"
-								Finished: (data[ gnm + '_Finished' ]=="true")?true:false
+								Finished: (data[ gnm + '_Finished' ]=="true")?true:false,
 							};
 
 							$scope.$watch( "Games["+gnm+"].T1S", function( oldval, newval ){
@@ -223,9 +267,9 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 		sender( command, data );
 	};
 
-	$scope.Watch = function(){
+	$scope.Watch = function( comp ){
 		Commander.Send( 'WATCH', {
-			competition: COMP,
+			competition: comp || COMP,
 			pwd: $scope.password
 		} );
 	}
@@ -233,7 +277,12 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 		var code = evt.keyCode;
 
 		if( code == 13 ){
-			$scope.Watch();
+			$scope.MenuShowing = false;
+			$scope.Watch( ($scope.NewCompetition)?$scope.NewCompetition:COMP );
+
+			$timeout( function(){
+				$scope.$digest();
+			} );
 		}
 	}
 

@@ -1,10 +1,19 @@
 /* DO NOT MODIFY unless you are changing fonts or background colors or something of that sort) */
 
+html{
+	margin: 0;
+	padding: 0;
+	min-height: 100%;
+}
+
 body.ui{
 	color: black;
 	background: gray;
 
-	font-family: "Roboto", Arial, sans-serif;	
+	font-family: "Roboto", Arial, sans-serif;
+
+	min-height: calc(100% - 16px);
+	height: 100%;
 }
 
 body#Scoreboard{

@@ -1,8 +1,16 @@
-body{
+html, body{
 	margin: 0;
 	padding: 0;
 
-	overflow-y: auto;
+	height: 100%;
+
+	position: absolute;
+
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	
 }
 
 div#title{
@@ -140,9 +148,18 @@ td, th{
 	font-size: 24pt;
 
 	text-align: center;
-	overflow-x: auto;
+	overflow-x: hidden;
 	white-space: nowrap;
+}
+td:not(.unique), th:not(.unique){
 	width: 30%;
+}
+td.full{
+	width: 95%;
+}
+td.placeholder{
+	color: #444;
+	font-style: italic;
 }
 th{
 	padding: 5px;
@@ -183,6 +200,13 @@ tr.flash:nth-child(odd){
 tr.flash:nth-child(even){
 	animation: updated-even 2.5s;
 	-webkit-animation: updated-even 2.5s;
+}
+
+td.no-games{
+	color: darkgrey;
+	font-style: italic;
+
+	text-align: center;
 }
 
 .dialog-content > h2{
