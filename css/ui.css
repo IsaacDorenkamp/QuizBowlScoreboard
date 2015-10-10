@@ -37,11 +37,29 @@ input[type="text"]:focus, input[type="password"]:focus{
 
 button{
 	padding: 8px;
+	border-radius: 5px;
+	border: 1px solid #999;
+	margin: 0 10px;
+	vertical-align: middle;
+
+	cursor: pointer;
 }
 button[type="submit"]{
 	border: 1px solid gray;
 	border-radius: 4px;
 	cursor: pointer;
+}
+button[type="submit"].submit-right{
+	float: right;
+	display: inline-block;
+	position: relative;
+	left: 0;
+	transition: left .25s ease-in-out, border-radius .25s ease-in-out;
+	-webkit-transition: left .25s ease-in-out, border-radius .25s ease-in-out;
+}
+button[type="submit"].submit-right:hover{
+	border-radius: 20px;
+	left: 8px;
 }
 
 select{
@@ -50,8 +68,10 @@ select{
 
 	background-color: white;
 	border: 1px solid gray;
-	border-radius: 3px;
+	border-radius: 6px;
 	cursor: pointer;
+
+	outline: none;
 
 	padding: 5px;
 	padding-right: 30px;
@@ -65,4 +85,8 @@ select{
 	background-image: url('../img/arrow.png');
 	background-position: 95% 50%;
 	background-repeat: no-repeat;
+}
+
+label{
+	padding-right: 10px;
 }

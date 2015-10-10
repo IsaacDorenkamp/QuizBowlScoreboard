@@ -49,6 +49,8 @@ div#sidebar-menu{
 	top: 0;
 	background-color: #555;
 
+	border-right: 1px solid black;
+
 	z-index: 6;
 
 	text-indent: 15px;

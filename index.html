@@ -4,19 +4,69 @@
 		<title>quizbowl.us home</title>
 		<link rel="stylesheet" href="css/Universal.css" />
 		<link rel="stylesheet" href="css/index.css" />
+		<link rel="stylesheet" href="css/ui.css" />
 
 		<script src="js/angular.min.js"></script>
+		<script src="js/app5/App5.js"></script>
+		<script>
+			APP5_PATH = 'js/app5';
+		</script>
+		<script src="js/global.js"></script>
 		<script src="js/index.js"></script>
 	</head>
 	<body>
 		<div id="app">
-			<div id="menu-button" ng-click="MenuShowing = !MenuShowing"></div>
+			<div id="menu-button" ng-click="ToggleMenu()"></div>
 			<div id="sidebar-menu" ng-class="{ visible: MenuShowing }">
 				<h3 class="title">quizbowl.us home</h3>
 				<ul>
-					<li>Hi</li>
+					<li onclick="PublicWatch.show()" ng-click="MenuShowing = false">Watch Public Competition</li>
+					<li onclick="PrivateWatch.show()" ng-click="MenuShowing = false">Watch Private Competition</li>
 				</ul>
 			</div>
+			<div id="main">
+				<h1>quizbowl.us home</h1>
+				<div id="search">
+					<input type="text" ng-model="Search.Query" placeholder="Search Competitions..." class="query" />
+				</div>
+				<h2>Competitions on quizbowl.us now</h2>
+				<div id="results">
+					<ul>
+						<li ng-repeat="result in Competitions | filter:Search.Query">
+							{{ result[1] }}<button class="right" ng-click="WatchGame(result[0])">Watch</button>
+						</li>
+					</ul>
+				</div>
+			</div>
 		</div>
+		<app5-modal>
+			<app5-dialog id="PublicWatch">
+				<div class="dialog-title">
+					Watch Public Competition
+					<img class="dialog-closer" src="img/x.png" alt="X" onclick="PublicWatch.close()" />
+				</div>
+				<div class="dialog-content">
+					<div>
+						Game:
+						<select ng-options="opt[0] as opt[1] for opt in Competitions" ng-model="SelectedCompetition"></select>
+					</div>
+					<button ng-click="WatchGame()" type="submit" class="submit-right">Watch</button>
+				</div>
+			</app5-dialog>
+			<app5-dialog id="PrivateWatch">
+				<div class="dialog-title">
+					Watch Private Competition
+					<img class="dialog-closer" src="img/x.png" alt="X" onclick="PrivateWatch.close()" />
+				</div>
+				<div class="dialog-content">
+					<form method="GET" action="watch.html">
+						<div>
+							<label>Access ID:</label><input type="text" name="competition" />
+						</div>
+						<button type="submit" class="submit-right">Watch</button>
+					</form>
+				</div>
+			</app5-dialog>
+		</app5-modal>
 	</body>
 </html>

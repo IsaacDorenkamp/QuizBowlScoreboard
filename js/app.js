@@ -161,7 +161,6 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 	}
 
 	Commander = new WebsocketCommander( socket );
-	console.log( Commander );
 	$scope.Commander = Commander;
 
 	$scope.Game = {

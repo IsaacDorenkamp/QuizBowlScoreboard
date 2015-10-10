@@ -84,3 +84,75 @@ div#menu-button{
 	background-position: center;
 	background-image: url('../img/menu-icon.png');
 }
+div#results > ul{
+	list-style-type: none;
+	padding: 0;
+	border: 2px solid #999;
+}
+div#results > ul > li{
+	padding: 10px 5px;
+	position: relative;
+}
+div#results > ul > li:nth-child(even){
+	background-color: #999;
+}
+div#results{
+	margin: 0 auto;
+	width: calc( 90% - 30px);
+}
+
+h1{
+	text-align: center;
+	margin: 0;
+	padding: 15px 0;
+	vertical-align: middle;
+}
+h2{
+	text-align: center;
+	margin-top: 20px;
+	margin-bottom: 0;
+}
+
+div#search{
+	margin: 10px;
+	text-align: center;
+}
+input[type="text"].query{
+	width: 90%;
+	padding: 10px;
+	font-size: 18pt;
+	text-indent: 25px;
+
+	background-image: url('../img/search.png');
+	background-repeat: no-repeat;
+	background-position: 10px;
+}
+
+button.right{
+	display: inline-block;
+	position: absolute;
+	right: 5px;
+	top: 50%;
+	transform: translateY( -50% );
+	-webkit-transform: translateY( -50% );
+}
+
+/* START SECTION -- Dialog Styling */
+
+app5-dialog#PublicWatch, app5-dialog#PrivateWatch{
+	min-width: 250px;
+	min-height: 125px;
+}
+app5-dialog#PublicWatch > div.dialog-content, app5-dialog#PrivateWatch >  div.dialog-content{
+	margin: 15px;
+}
+
+img.dialog-closer{
+	cursor: pointer;
+}
+
+.dialog-content > div, .dialog-content > form > div{
+	margin-bottom: 5px;
+}
+
+/* END SECTION -- Dialog Styling */

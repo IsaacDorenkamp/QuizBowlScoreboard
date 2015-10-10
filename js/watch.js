@@ -116,11 +116,10 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 		case 'POPULATE_CLIST':
 			$scope.Competitions = [];
 			for( key in data ){
-				if( key == 'getInstruction' ) continue;
+				if( key == 'getInstruction' || !data.hasOwnProperty( key ) ) continue;
 				$scope.Competitions.push( [key, data[key]] );
 			}
 			if( $scope.Competitions.length ) $scope.NewCompetition = $scope.Competitions[0][0];
-			console.log( $scope.NewCompetition );
 			break;
 		case 'ADD_C':
 			var aid = data['access_id'] || null;
@@ -268,6 +267,7 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 	};
 
 	$scope.Watch = function( comp ){
+		console.log( "Ima be watch " + comp );
 		Commander.Send( 'WATCH', {
 			competition: comp || COMP,
 			pwd: $scope.password
@@ -278,7 +278,7 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 
 		if( code == 13 ){
 			$scope.MenuShowing = false;
-			$scope.Watch( ($scope.NewCompetition)?$scope.NewCompetition:COMP );
+			$scope.Watch( COMP );
 
 			$timeout( function(){
 				$scope.$digest();
@@ -291,6 +291,32 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 	$scope.password = "";
 	$scope.Error = "";
 
+	function hasParent( target, elem ){
+		if( typeof elem == 'string' ){
+			elem = document.getElementById( elem );
+		}
+
+
+		if( target.id == elem.id ){
+			return true;
+		}else if( !target.parentNode || target.parentNode.nodeName == 'html' ){
+			return false;
+		}else{
+			return hasParent( target.parentNode, elem );
+		}
+	}
+
+	window.onclick = function(evt){
+		console.log( hasParent(evt.target, 'sidebar-menu') );
+		if( evt.target.id == "menu-button" || hasParent(evt.target, 'sidebar-menu') ){
+			return;
+		}
+
+		$scope.MenuShowing = false;
+		if( !$scope.$$phase ){
+			$scope.$digest();
+		}
+	}
 	window.onbeforeunload = function(){
 		Commander.Send( 'UNWATCH', {} );
 	}
