@@ -54,8 +54,6 @@ var CookieService = { //Basic Cookie Functions to manipulate cookies
 
 	Set: function( cookie, val, expires ){
 		expires = expires || CookieUtilities.GetNextWeek();
-
-		console.log( cookie + '=' + val + ';expires=' + expires.toString() );
 		document.cookie = cookie + '=' + val + ';expires=' + expires.toString();
 	},
 
@@ -84,10 +82,12 @@ var Application = {
 	ShowingWarning: false,
 	PropertySetter: null,
 	LoginDialog: null,
+	RecoverDialog: null,
 	TeamSetter: null,
 	Intro: null,
 	DoResults: null,
 	LoginForm: null,
+	RecoverForm: null,
 	ProgressDialog: null,
 	SuccessDialog: null,
 	FailureDialog: null,
@@ -117,8 +117,9 @@ var Application = {
 		this.Intro.close();
 	},
 	FinishPrompt: function(){
-		this.PromptCallback( PromptForm.elements["prompt"].value );
 		this.PromptDialog.close();
+		this.PromptCallback( PromptForm.elements["prompt"].value );
+		PromptForm.elements["prompt"].value = "";
 	}
 }
 
@@ -289,6 +290,7 @@ function InitializeCore(){
 	Application.PropertySetter = q('#PropertySetter-Dialog');
 	Application.PropertySetter.Box = q('#PropertySetter-Box');
 	Application.LoginDialog    = q('#LoginDialog');
+	Application.RecoverDialog  = q('#RecoverDialog');
 	Application.TeamSetter     = q('#TeamSetter-Dialog');
 	Application.TeamSetter.Box = q('#TeamSetter-Box');
 
@@ -296,6 +298,7 @@ function InitializeCore(){
 	Application.DoResults      = q('#DoResults');
 
 	Application.LoginForm = q('#LoginForm');
+	Application.RecoverForm = q('#RecoverForm');
 
 	Application.ProgressDialog = q('#ProgressDialog');
 	Application.SuccessDialog = q('#SuccessDialog');

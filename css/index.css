@@ -1,3 +1,5 @@
+/* START SECTION -- Page Component Styling */
+
 html, body{
 	margin: 0;
 	padding: 0;
@@ -113,10 +115,34 @@ h2{
 	margin-bottom: 0;
 }
 
+div#no-results{
+	text-align: center;
+	font-style: italic;
+	padding: 15px;
+	color: #333;
+}
+
 div#search{
 	margin: 10px;
 	text-align: center;
 }
+
+/* START SUBSECTION -- Link Styling */
+
+a[title]{
+	text-decoration: underline;
+	cursor: pointer;
+}
+a[title]:hover{
+	text-decoration: none;
+}
+
+/* END SUBSECTION -- Link Styling */
+
+/* END SECTION -- Page Component Styling */
+
+/* START SECTION -- UI Styling */
+
 input[type="text"].query{
 	width: 90%;
 	padding: 10px;
@@ -137,6 +163,37 @@ button.right{
 	-webkit-transform: translateY( -50% );
 }
 
+input[type="checkbox"]{
+	cursor: pointer;
+}
+
+/* END SECTION -- UI Styling */
+
+/* START SECTION -- Table Styling */
+
+table{
+	text-align: center;
+	display: block;
+}
+table.display{
+	margin: 10px 0;
+}
+tbody{
+	display: inline-block;
+}
+table.display > tbody{
+	border: 1px solid black;
+}
+
+td:nth-child(odd){
+	text-align: right;
+}
+td:nth-child(even){
+	text-align: left;
+}
+
+/* END SECTION -- Table Styling */
+
 /* START SECTION -- Dialog Styling */
 
 app5-dialog#PublicWatch, app5-dialog#PrivateWatch{
@@ -153,6 +210,10 @@ img.dialog-closer{
 
 .dialog-content > div, .dialog-content > form > div{
 	margin-bottom: 5px;
+}
+
+.dialog-content{
+	padding: 5px;
 }
 
 /* END SECTION -- Dialog Styling */

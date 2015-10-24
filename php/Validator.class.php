@@ -9,5 +9,14 @@
 
 			return false;
 		}
+		static function Competition( $mysqli, $caid ){
+			$res = $mysqli -> query("SELECT * FROM `competitions` WHERE access_id='$caid'");
+
+			if( ($res && $res -> num_rows) || $res=='competitions' ){
+				return true;
+			}
+
+			return false;
+		}
 	}
 ?>

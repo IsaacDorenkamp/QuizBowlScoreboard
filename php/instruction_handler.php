@@ -5,6 +5,15 @@
 	require_once('Game.class.php');
 	require_once('Validator.class.php');
 
+	function censor( $pwd ){
+		$len = strlen( $pwd );
+		$output = "";
+		for( $i = 0; $i < $len; $i++ ){
+			$output .= "*";
+		}
+		return $output;
+	}
+
 
 	class Protocol{
 		private $watching = array();
@@ -30,11 +39,8 @@
 				
 				$success = mail( $addr, 'QuizBowl Notification', $cont, 'From: notifications@quizbowl.us'  );
 				break;
-
-			//BE SURE WHEN ADDING COMPETITION CREATING TO SEND NEW COMPETITION TO CLIENTS TO ADD TO LIST!!!!!//
-			//Also make sure to remove competitions that are removed for some strange reason...//
-			//Finally, make sure to use NodeJS next time. I only used PHP because the original hosting plan didn't support NodeJS.//
-			//Little did I know we would need the Virtual Server plan anyway for the Websocket server! This is my programming sob story.//
+			//Make sure to use NodeJS if you decide to reprogram the server. I only used PHP because the original hosting plan didn't support NodeJS.//
+			//Little did I know we would need the Virtual Server plan (which supports Node) anyway to support the Websocket server! This is the story of the birth of this program.//
 			case 'CREATE_GAME':
 				$gnm     = $mysqli -> real_escape_string( GetSafeValue($data, 'room') );
 				$comp_pwd    = $mysqli -> real_escape_string( GetSafeValue($data, 'password') );
@@ -44,10 +50,13 @@
 				$t1n     = $mysqli -> real_escape_string( GetSafeValue($data, 'Team1_Name') );
 				$t2n     = $mysqli -> real_escape_string( GetSafeValue($data, 'Team2_Name') );
 
-				$override = GetSafeValue( $data, 'progress-override' )=="true"?true:false;
+				if( empty( $gnm ) || empty( $t1n ) || empty( $t2n ) ){
+					return "ERROR\n"
+						  ."message: Insufficient data given to create game.";
+				}
 
 				$comp_rows = $mysqli -> query( "SELECT * FROM `competitions` WHERE access_id='$access_id'" );
-				if( !($comp_rows -> num_rows) ){
+				if( !$comp_rows || !($comp_rows -> num_rows) ){
 					$output = "ERROR\n"
 							 ."message: Invalid Access ID.";
 
@@ -66,27 +75,6 @@
 				$comp = $comp_row['name'];
 				$comp_id = $comp_row['cid'];
 
-
-				if( empty( $gnm ) || empty( $t1n ) || empty( $t2n ) ){
-					return ERR_INSUFFICIENT_DATA;
-				}
-
-				//Validator functions return true if the item (e.g. a game) already exists in the database.
-				if( Validator::Game( $mysqli, $gnm, $access_id ) ){
-					if( !$override ){
-						return "CONFIRM_OVERRIDE\n"
-						  ."message: Game in room $gnm already exists.\nIf you wish to proceed with this action, enter\nthe competition password here and hit OK.";
-					}else{
-						$query = "UPDATE `$access_id` SET Team1_Name='$t1n', Team2_Name='$t2n', Team1_Score=0, Team2_Score=0 WHERE room=$gnm";
-
-						$mysqli -> query( $query );
-
-						if( $mysqli -> error ) return "ERROR\n" . "message: " . $mysqli -> error;
-
-						return "OK";
-					}
-				}
-
 				$query = "INSERT INTO `$access_id` VALUES ( '$t1n', '$t2n', 0, 0, $comp_id, '$gnm', 0, '' )";
 
 				$mysqli -> query( $query );
@@ -95,9 +83,12 @@
 
 				$for="login";
 
+				$cnm = $comp_row['name'];
+
 				$gid = $mysqli -> insert_id;
 				$other = "cid: $comp_id\n"
-						."gid: $gid";
+						."gid: $gid\n"
+						."cnm: $cnm";
 
 				$usepi = ParsedInstruction::parse( "CREATE_GAME\n"
 												  ."gid:$gid\n"
@@ -109,6 +100,65 @@
 												  ."finished:false" );
 
 				$this -> process_watch_instruction( $usepi, $sock );
+
+				break;
+			case 'RECOVER_GAME':
+				$comp_pwd    = $mysqli -> real_escape_string( GetSafeValue($data, 'password') );
+				$access_id = $mysqli -> real_escape_string( GetSafeValue($data, 'access_id') );
+				$gid = $mysqli -> real_escape_string( GetSafeValue($data, 'gid') );
+
+				if( empty( $comp_pwd ) || empty( $access_id ) || empty( $gid ) ){
+					return "ERROR\n"
+						  ."message: Insufficient data given to recover game.";
+				}
+
+				$comp_rows = $mysqli -> query( "SELECT * FROM `competitions` WHERE access_id='$access_id'" );
+				if( !$comp_rows || !($comp_rows -> num_rows) ){
+					$output = "ERROR\n"
+							 ."message: Invalid Access ID.";
+
+					return $output;
+				}
+
+				$comp_row = $comp_rows -> fetch_assoc();
+
+				if( !( password_verify( $comp_pwd, $comp_row['pwd'] ) ) ){
+					$output = "ERROR\n"
+							 ."message: Invalid Password.";
+
+					return $output;
+				}
+
+				$comp = $comp_row['name'];
+				$comp_id = $comp_row['cid'];
+
+				$query = "SELECT * FROM `$access_id` WHERE gid=$gid";
+
+				$resset = $mysqli -> query( $query );
+
+				if( !$resset || !($resset -> num_rows) ){
+					return "ERROR\n"
+						  ."message: Game with GID $gid not found.";
+				}
+
+				$res = $resset -> fetch_assoc();
+
+				$t1s = $res['Team1_Score'];
+				$t2s = $res['Team2_Score'];
+				$t1n = $res['Team1_Name'];
+				$t2n = $res['Team2_Name'];
+				$gnm = $res['room'];
+				$cnm = $comp_row['name'];
+
+				$for="recover";
+				$other = "cid: $comp_id\n"
+						."gid: $gid\n"
+						."T1S: $t1s\n"
+						."T2S: $t2s\n"
+						."T1N: $t1n\n"
+						."T2N: $t2n\n"
+						."room: $gnm\n"
+						."cnm: $cnm";
 
 				break;
 			case 'SAVE_SCORE':
@@ -147,13 +197,15 @@
 
 				break;
 			case 'FINALIZE':
-				$pwd = GetSafeValue($data, 'pwd');
-				$gid = GetSafeValue($data, 'gid');
-				$cid = GetSafeValue($data, 'cid');
-				if( !isset($games[$gid]) ) break;
-				unset( $games[$gid] );
+				$pwd = $mysqli -> real_escape_string( GetSafeValue($data, 'pwd') );
+				$gid = $mysqli -> real_escape_string( GetSafeValue($data, 'gid') );
+				$cid = $mysqli -> real_escape_string( GetSafeValue($data, 'cid') );
 
-				$row = $mysqli -> query( 'SELECT * FROM `competitions` WHERE cid=$cid' );
+				$row = $mysqli -> query( "SELECT * FROM `competitions` WHERE cid=$cid" );
+				if( $mysqli -> error ){
+					return "ERROR\n"
+						  ."message: " . $mysqli -> error;
+				}
 				if( !$row ){
 					return "ERROR\n"
 						  ."message: No competition with that ID was found!";
@@ -165,12 +217,15 @@
 				if( !password_verify( $pwd, $password ) ){
 					return "ERROR\n"
 						  ."message: Invalid password for competition\n#$cid; will not finalize scores.";
-
 				}
 
 				$query = "UPDATE `$access_id` SET finished=1 WHERE gid=$gid\n";
 
 				$mysqli -> query( $query );
+				if( $mysqli -> error ){
+					return "ERROR\n"
+						  ."message: " . $mysqli -> error;
+				}
 
 				$this -> process_watch_instruction( $pi, $sock );
 
@@ -337,6 +392,59 @@ OUTPUT;
 				}
 
 				return $output;
+			case 'CREATE_COMPETITION':
+				$cname = $mysqli -> real_escape_string( GetSafeValue($data, 'Name') );
+				$aid   = $mysqli -> real_escape_string( GetSafeValue($data, 'ID') );
+				$pwd   = $mysqli -> real_escape_string( password_hash(GetSafeValue($data, 'Password'), PASSWORD_BCRYPT, ['cost' => 11]) );
+				$ispub = (GetSafeValue($data, 'ispublic')=="false")?false:true;
+				$vk    = $mysqli -> real_escape_string( password_hash(GetSafeValue($data, 'viewkey'), PASSWORD_BCRYPT, ['cost' => 11]) );
+
+				if( !$cname || !$aid || !$pwd || (!$ispub && (!$vk)) ){
+					$error = "ERROR\n"
+							."message: Insufficient Data. Be sure to fill in all required form fields.";
+				}
+				if( $ispub ){
+					$vk = "NULL";
+				}else{
+					$vk = "'" . $vk . "'";
+				}
+				if( Validator::Competition($mysqli, $aid) ){
+					$error = "ERROR\n"
+						    ."message: Competition already exists.";
+					return $error;
+				}
+				$query = <<<QUERY
+CREATE TABLE $cname(
+	Team1_Name varchar(45),
+	Team2_Name varchar(45),
+	Team1_Score int,
+	Team2_Score int,
+	comp_name varchar(45),
+	room varchar(40),
+	finished boolean,
+	gid int AUTO_INCREMENT PRIMARY KEY
+)
+QUERY;
+				
+				$mysqli -> query( $query );
+
+				if( $mysqli -> error ) return "ERROR\nmessage: " . $mysqli -> error;
+
+				$pubval = $ispub?'1':'0';
+
+				$query = "INSERT INTO `competitions` VALUES ('$cname', '$pwd', '$aid', $pubval, $vk, '')";
+
+				$mysqli -> query( $query );
+
+				if( $mysqli -> error ) return "ERROR\nmessage: " . $mysqli -> error;
+
+				return "CREATED\n"
+					  ."Name: $cname\n"
+					  ."ID: $aid\n"
+					  ."Password: " . censor($pwd) . "\n"
+					  ."Public: " . (($ispub)?'Yes':'No') . "\n"
+					  .((!$ispub)?"ViewKey: " . $vk:"");
+				break;
 			case 'UNWATCH':
 				foreach( $this -> watching as $key => $value ){
 					if( $value["USER"] -> id == $sock -> id ){

@@ -110,6 +110,7 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 	socket = new WebSocket( GLOBALS.SOCKET.protocol + '://' + host + ':' + GLOBALS.SOCKET.port );
 
 	$scope.Error = "";
+	$scope.SuccessMsg = "";
 
 	socket.onmessage = function(msg){
 		var data = Commander.Parse( msg.data );
@@ -125,10 +126,51 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 				Application.SuccessDialog.show();
 				var gid = parseInt(data.gid);
 				var cid = parseInt(data.cid);
+				var cnm = data.cnm;
+
+				$scope.SuccessMsg = "Your GID is " + gid + ". Make sure to remember this in case of emergency, so that you can recover your data.";
+
 				$scope.Game.GID = gid;
 				$scope.Game.CID = cid;
 				$scope.Game.GameStarted = true;
 				correct_pwd = input_pwd;
+
+				$scope.Properties.Title = cnm;
+
+				if( !$scope.$$phase ){
+					$scope.$digest();
+				}
+			}else if( response_to == "finalizing" ){
+				$scope.Game.Reset();
+				$scope.Game.GameStarted = false;
+			}else if( response_to == "recover" ){
+				var t1s  = parseInt( data.T1S ) || 0;
+				var t2s  = parseInt( data.T2S ) || 0;
+				var t1n  = data.T1N;
+				var t2n  = data.T2N;
+				var gid  = data.gid;
+				var cid  = data.cid;
+				var room = data.room;
+				var cnm  = data.cnm;
+
+				$scope.Game.GID = gid;
+				$scope.Game.CID = cid;
+				$scope.Game.GameStarted = true;
+
+				$scope.Game.Team1.setScore( t1s );
+				$scope.Game.Team2.setScore( t2s );
+
+				$scope.Game.Team1.setName( t1n );
+				$scope.Game.Team2.setName( t2n );
+
+				$scope.Properties.room  = room;
+				$scope.Properties.Title = cnm;
+
+				Application.SuccessDialog.show();
+
+				if( !$scope.$$phase ){
+					$scope.$digest();
+				}
 			}
 			return; //All's OK
 		}else if( inst.split('_')[0] === "ERR" ){
@@ -297,8 +339,10 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 				if( self.QuestionTime.seconds == 5 && self.QuestionTime.decis == 0 && Application.WarningBox.checked ){
 					Application.Warn( Audio.FiveSeconds );
 				}
-				//Need to $$digest to update values in Angular
-				$scope.$digest();
+				//Need to $scope.digest to update values in Angular
+				if( !$scope.$$phase){
+					$scope.$digest();
+				}
 
 				var dtm = new Date().getTime();
 				var diff = (dtm - start) - time;
@@ -324,6 +368,12 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 			this.ResetQuestionTimer();
 			this.Team1.setScore( 0 );
 			this.Team2.setScore( 0 );
+			this.Team1.setName('Team1');
+			this.Team2.setName('Team2');
+
+			if( !$scope.$$phase ){
+				$scope.$digest();
+			}
 		},
 		ResetConfirm: function(){
 			if( confirm('Are you sure you want to reset?') ){
@@ -361,12 +411,46 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 				return;
 			}
 			meta['password'] = pwd;
-			if( progress_override != undefined ) meta['progress-override'] = progress_override;
 			meta['access_id'] = aid;
 			meta['room'] = $scope.Properties.Room;
 
 			Commander.Send( 'CREATE_GAME', meta );
 		},
+
+		Recover: function( other_pwd, progress_override ){
+			if( this.GameStarted ){
+				Application.RecoverDialog.close();
+				this.Alert( "Game already Created!", "Error" );
+				return;
+			}
+
+			Application.RecoverDialog.close();
+			Application.ProgressDialog.show();
+			var meta = {};
+
+			var form = Application.RecoverForm;
+
+			var pwd  = other_pwd || form.elements["comp_pwd"].value;
+			input_pwd = pwd;
+			var aid  = form.elements["comp_access_id"].value;
+			var gid  = parseInt(form.elements["gid"].value) || '';
+			if( pwd == "" || aid == "" ){
+				Application.RecoverDialog.close();
+				Application.ProgressDialog.close();
+				this.Alert( "One or more form fields were left empty.", "Error" );
+				return;
+			}
+
+			if( !pwd ){
+				return;
+			}
+			meta['password'] = pwd;
+			meta['access_id'] = aid;
+			meta['gid']  = gid;
+
+			Commander.Send( 'RECOVER_GAME', meta );
+		},
+
 
 		Destroy: function(){
 			if( !this.GameStarted ){
@@ -378,11 +462,11 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 				var meta = {
 					gid: $scope.Game.GID,
 					cid: $scope.Game.CID,
-					password: auth
+					pwd: auth
 				};
 
 				Commander.Send( 'FINALIZE', meta );
-				console.log("Ending");
+				$timeout( Application.ProgressDialog.show() );
 			}, 'password' );
 		},
 
@@ -437,6 +521,12 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 		}
 	};
 
+	window.onbeforeunload = function(){
+		if( $scope.Game.GameStarted ){
+			return "A game has been started, but the scores have not been finalized! Would you like to stay and finalize the scores before you leave?";
+		}
+	};
+
 	(function loop(){
 		if( !socket_available ){
 			setTimeout( loop, 100 );
@@ -472,15 +562,14 @@ function ScoreBoard_Ctrl( $scope, $http, $sce, $timeout ){
 					'comp_pwd': correct_pwd
 				} );
 			});
-			$scope.$on( 'destroy', function(){
-				Commander.Send( "END_GAME", {
+
+			$scope.$on( '$locationChangeStart', function(){
+				Commander.Send( "FINALIZE", {
 					'pwd': correct_pwd,
 					'cid': $scope.Game.CID,
 					'gid': $scope.Game.GID
 				} );
-			});	
+			} );
 		})();
 	})();
-
-	
 }

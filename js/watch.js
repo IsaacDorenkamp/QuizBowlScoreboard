@@ -105,9 +105,6 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 	socket.onmessage = function(evt){
 		var data = Commander.Parse( evt.data );
 
-		console.log( data );
-		console.log( data.getInstruction() );
-
 		switch( data.getInstruction() ){
 		case 'NO_COMPETITIONS':
 			$scope.Competitions = [];
@@ -120,23 +117,6 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 				$scope.Competitions.push( [key, data[key]] );
 			}
 			if( $scope.Competitions.length ) $scope.NewCompetition = $scope.Competitions[0][0];
-			break;
-		case 'ADD_C':
-			var aid = data['access_id'] || null;
-			var cnm = data['name'] || null;
-
-			if( aid && cnm ){
-				$scope.Competitions[aid] = cnm;
-				if( !$scope.$$phase ){
-					$scope.$digest();
-				}
-			}
-			break;
-		case 'REMOVE_C':
-			var aid = data['access_id'] || null;
-			if( aid ){
-				delete $scope.Competitions[aid];
-			}
 			break;
 		case 'INITIALIZE':
 			$timeout( function(){
@@ -166,29 +146,21 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 								Finished: (data[ gnm + '_Finished' ]=="true")?true:false,
 							};
 
-							$scope.$watch( "Games["+gnm+"].T1S", function( oldval, newval ){
-								if( oldval != newval ){
-									if( !$scope.Games[gnm].SU ) $scope.Games[gnm].SU = true;
-									$timeout( function(){
-										$scope.Games[gnm].SU = false;
-									}, 2500 );
-								}
-							} );
-							$scope.$watch( "Games["+gnm+"].T2S", function( oldval, newval ){
-								if( oldval != newval ){
-									if( !$scope.Games[gnm].SU ) $scope.Games[gnm].SU = true;
-									$timeout( function(){
-										$scope.Games[gnm].SU = false;
-									}, 2500 );
-								}
-							} );
-
 							if( $scope.Games[gnm].SU ){
 								$timeout( function(){
 									$scope.Games[gnm].SU = false;
 								}, 2500 )
 							}
 						}else{
+							if( !$scope.Games[gnm].SU ){
+								$scope.Games[gnm].SU = true;
+								setTimeout( function(){
+									$scope.Games[gnm].SU = false;
+									if( !$scope.$$phase ){
+										$scope.$digest();
+									}
+								}, 2500 );
+							}
 							$scope.Games[gnm]["T1S"] = data[gnm + '_T1S'];
 							$scope.Games[gnm]["T2S"] = data[gnm + '_T2S'];
 							$scope.Games[gnm]["T1N"]  = data[gnm + '_T1N'];
@@ -267,7 +239,6 @@ function GameWatch( $scope, $sce, $timeout, $window ){
 	};
 
 	$scope.Watch = function( comp ){
-		console.log( "Ima be watch " + comp );
 		Commander.Send( 'WATCH', {
 			competition: comp || COMP,
 			pwd: $scope.password

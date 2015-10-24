@@ -54,6 +54,7 @@
 				<app5-menu id="Function-Menu">
 					<app5-menu-item onclick="Application.LoginDialog.show()" id="StartGame">Start Game</app5-menu-item>
 					<app5-menu-item ng-click="Game.Destroy()" id="FinalizeScores">Finalize Scores</app5-menu-item>
+					<app5-menu-item onclick="Application.RecoverDialog.show()" id="RecoverGame">Recover Game</app5-menu-item>
 					<app5-menu-item ng-click="Game.ResetConfirm()">Reset Scoreboard</app5-menu-item>
 				</app5-menu>
 				<app5-menu id="Settings-Menu">
@@ -248,6 +249,33 @@
 					</form>
 				</div>
 			</app5-dialog>
+			<app5-dialog id="RecoverDialog">
+				<div class="dialog-title">
+					Recover In-Progress Game
+					<a href="javascript:Application.RecoverDialog.close()" class="dialog-closer"><img src="img/x.png" alt="X" /></a>
+				</div>
+				<div class="dialog-content">
+					<form action="#" method="POST" onsubmit="App5.consume( event )" ng-submit="Game.Recover( Application.RecoverForm )" id="RecoverForm">
+						<table class="form">
+							<tbody>
+								<tr>
+									<td>Access ID:</td>
+									<td><input type="text" name="comp_access_id" /></td>
+								</tr>
+								<tr>
+									<td>Password:</td>
+									<td><input type="password" name="comp_pwd" /></td>
+								</tr>
+								<tr>
+									<td>GID:</td>
+									<td><input type="text" name="gid" /></td>
+								</tr>
+							</tbody>
+						</table>
+						<button type="Submit">Recover Game</button>
+					</form>
+				</div>
+			</app5-dialog>
 			<app5-dialog id="ProgressDialog">
 				<div class="dialog-title">
 					Please Wait...
@@ -263,7 +291,10 @@
 				</div>
 				<div class="dialog-content">
 					<h1 class="success">Success!</h1>
-					<button onclick="Application.SuccessDialog.close()" class="ok">OK</button>
+					<p ng-if="SuccessMsg">
+						{{ SuccessMsg }}
+					</p>
+					<button onclick="Application.SuccessDialog.close()" ng-click="SuccessMsg = ''" class="ok">OK</button>
 				</div>
 			</app5-dialog>
 			<app5-dialog id="FailureDialog" class="status-dialog">
